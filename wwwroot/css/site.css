@@ -13,17 +13,41 @@ header {
 	font-style: normal;
 	font-weight: 400;
 }
+@keyframes emerge {
+  0% { opacity: 0; }
+  100% { opacity: 1; }
+}
+
+.emerge-text {
+  animation: emerge 3s ease-in-out forwards;
+}
+
+@keyframes emerge-hdr {
+  10% { opacity: 0.1; }
+  100% { opacity: 1; }
+}
+
+.emerge-text-hdr {
+  animation: emerge-hdr 3s ease-in-out forwards;
+}
+
 /* Logo placeholder*/
 #logo {
 	float: left;
 	padding-top: 10px;
 	padding-bottom: 10px;
 	width: 139px;
+  height: auto;
 	text-align: center;
 	color: rgb(66, 65, 65);
 	background-color: rgba(190,190,190,1.00);
   border-top-width: 2px;
   border-top-color: black;
+  background-image: url("/img/logo.png");
+  background-repeat: no-repeat;
+  background-position: center;
+  opacity: 0.7;
+  
 }
 /* div for Links in header */
 #headerLinks {
@@ -50,8 +74,9 @@ header {
 	background-color: rgba(246,246,246,1.00);
 	color: rgba(146,146,146,1.00);
 	padding-left: 115px;
-	padding-top: 57px;
-	padding-bottom: 57px;
+	padding-top: 5px;
+	padding-bottom: 5px;
+  height: 20px;
 }
 /* Main content of the site */
 #content {
@@ -83,10 +108,25 @@ header {
 	width: 75%;
 	text-align: center;
 	padding-left: 1%;
+  padding-top: 1%;
   color: rgb(146, 146, 146);
   background-color: rgba(246,246,246,1.00);
-  
+  /*background-image: url("/img/background-04.jpg");*/
+  opacity: 0.9;
 }
+
+#content .mainIndexContent {
+	float: left;
+	width: 75%;
+	text-align: left;
+	padding-left: 1%;
+  padding-top: 1%;
+  color: rgb(146, 146, 146);
+  background-color: rgba(246,246,246,1.00);
+  /*background-image: url("/img/background-04.jpg");*/
+  opacity: 0.9;
+}
+
 /*menubar's properties for menus in sidebar */
 #content .sidebar #menubar {
 	text-align: left;
@@ -420,3 +460,4 @@ header #headerLinks a {
 	padding-left: 0px;
 }
 }
+

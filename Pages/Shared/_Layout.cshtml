@@ -18,41 +18,50 @@
         <header>
         <!-- Header content goes here -->
             
-            <div id="logo"> <!-- <img src="logoImage.png" alt="sample logo"> --> 
+            <a  href="/"><div id="logo"> 
+                <!-- <img src="/img/logo.png" alt="sample logo">
             <!-- Company Logo text --> 
-            LOGO </div>
-            <div id="headerLinks"><a href="#" title="Login/Register">Login/Register</a></div>
+            K</div></a>
+            <div id="headerLinks"><a href="#" title="Login">Login</a></div>
+            
         </header>
+        <section id="offer"> 
+                <h3 align="center">Interactive Aikido Library</h3>
+        </section>
         <div id="content">
             <section class="sidebar"> 
                 <!-- This adds a sidebar with 1 searchbox,2 menusets, each with 4 links -->
                 <input type="text"  id="search" value="search">
                 <div id="menubar">
                     <nav class="menu">
-                    <h2><!-- Title for menuset 1 -->MENU ITEM 1 </h2>
+                    <h2><!-- Title for menuset 1 -->MENU </h2>
                     <hr>
                     <ul>
                         <!-- List of links under menuset 1 -->
-                        <li><a href="#" title="Link">Link 1</a></li>
-                        <li><a href="#" title="Link">Link 2</a></li>
-                        <li><a href="#" title="Link">Link 3</a></li>
-                        <li class="notimp"><!-- notimp class is applied to remove this link from the tablet and phone views --><a href="#"  title="Link">Link 4</a></li>
+                        <li><a href="/library-titles" title="Link">Library</a></li>
+                        <!--<li><a href="#" title="Link">Link 2</a></li>
+                        <li><a href="#" title="Link">Link 3</a></li> 
+                        <li class="notimp"> notimp class is applied to remove this link from the tablet and phone views 
+                        <a href="#"  title="Link">Link 4</a></li>-->
                     </ul>
                     </nav>
+<!--                    
                     <nav class="menu">
                     <h2>MENU ITEM 2 </h2>
-                    <!-- Title for menuset 2 -->
                     <hr>
                     <ul>
-                        <!--List of links under menuset 2 -->
+                        List of links under menuset 2 
                         <li><a href="#" title="Link">Link 1</a></li>
                         <li><a href="#" title="Link">Link 2</a></li>
                         <li><a href="#" title="Link">Link 3</a></li>
-                        <li class="notimp"><!-- notimp class is applied to remove this link from the tablet and phone views --><a href="#" title="Link">Link 4</a></li>
+                        <li class="notimp">  notimp class is applied to remove this link from the tablet and phone views 
+                        <a href="#" title="Link">Link 4</a></li>
                     </ul>
                     </nav>
+-->                    
                 </div>
             </section>
+            
             <main>
                 @RenderBody()
             </main>
