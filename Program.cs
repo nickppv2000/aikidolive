@@ -1,7 +1,14 @@
+using Microsoft.Azure.Cosmos;
+using AikidoLive;
+using AikidoLive.Services.DBConnector;
+
 var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
 builder.Services.AddRazorPages();
+
+builder.Services.AddScoped<DBServiceConnector>();
+
 
 var app = builder.Build();
 

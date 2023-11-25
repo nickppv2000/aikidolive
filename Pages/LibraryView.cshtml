@@ -1,0 +1,26 @@
+@page
+@model AikidoLive.Pages.LibraryView
+@{
+    ViewData["Title"] = "Library View";
+}
+
+<h1>@ViewData["Title"]</h1>
+
+<ul>
+    @if (null != Model._libDocuments)
+    {
+        @foreach (var docs in Model._libDocuments)
+        {
+            @foreach (var content in docs.LibraryContents)
+            {
+                <li>@content.LibraryName</li>
+                @foreach (var chapter in content.Chapters)
+                {
+                    <ul>
+                        <li><a href=@chapter.Url>@chapter.Name: @chapter.Description</a></li>
+                    </ul>
+                }
+            }
+        }
+    }
+</ul>
