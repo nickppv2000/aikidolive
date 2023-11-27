@@ -1,0 +1,26 @@
+@page
+@model AikidoLive.Pages.Playlists
+@{
+    ViewData["Title"] = "Playlists";
+}
+
+<h1>@ViewData["Title"]</h1>
+
+<ul>
+    @if (null != Model._playlistsDocuments)
+    {
+        @foreach (var docs in Model._playlistsDocuments)
+        {
+            @foreach (var content in docs.PlaylistsContents)
+            {
+                <li>@content.PlaylistName</li>
+                @foreach (var track in content.Tracks)
+                {
+                    <ul>
+                        <li><a href=@track.Url>@track.Name: @track.Description</a></li>
+                    </ul>
+                }
+            }
+        }
+    }
+</ul>

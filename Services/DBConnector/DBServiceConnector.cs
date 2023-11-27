@@ -14,13 +14,23 @@ namespace AikidoLive.Services.DBConnector
         private List<string> _databases;
         private Dictionary<string, List<string>> _databasesDictionary;
 
+        private string _libraryDbName;
+        private string _usersDBName;
+        private string _playlistsDBName;
+
         public DBServiceConnector(IConfiguration configuration)
         {
             var cosmosDbSettings = configuration.GetSection("CosmosDb");
             _client = new CosmosClient(cosmosDbSettings["Account"], cosmosDbSettings["Key"]);
             _databasesDictionary = new Dictionary<string, List<string>>();
             _databases = new List<string>();
-            
+            var libraryDbSettings = configuration.GetSection("libraryDB");
+            _libraryDbName = libraryDbSettings["document"];
+            var usersDbSettings = configuration.GetSection("usersDB");
+            _usersDBName = usersDbSettings["document"];
+
+            var playlistsDbSettings = configuration.GetSection("playlistsDB");
+            _playlistsDBName = playlistsDbSettings["document"];
         }
 
         public static async Task<DBServiceConnector> CreateAsync(IConfiguration configuration)
@@ -37,9 +47,13 @@ namespace AikidoLive.Services.DBConnector
 
         public async Task<List<LibraryDocument>> GetLibraryTitles()
         {
-            _container = _client.GetContainer(_databasesDictionary.Keys.First(), _databasesDictionary.Values.First().First());
+            string databaseName = _databasesDictionary.Keys.First();
+            string containerName = _databasesDictionary.Values.First().First();
 
-            var query = new QueryDefinition("SELECT * FROM c");
+            _container = _client.GetContainer(databaseName, containerName);
+
+            //var query = new QueryDefinition("SELECT * FROM c");
+            var query = new QueryDefinition("SELECT * FROM c WHERE c.id=\"" + _libraryDbName + "\"");
             var iterator = _container.GetItemQueryIterator<LibraryDocument>(query);
 
             var libraryDocuments = new List<LibraryDocument>();
@@ -52,6 +66,52 @@ namespace AikidoLive.Services.DBConnector
 
             return libraryDocuments;
         }
+
+        public async Task<List<UserList>> GetUsers()
+        {
+            string databaseName = _databasesDictionary.Keys.First();
+            string containerName = _databasesDictionary.Values.First().First();
+
+            _container = _client.GetContainer(databaseName, containerName);
+
+            //var query = new QueryDefinition("SELECT * FROM c");
+            var query = new QueryDefinition("SELECT * FROM c WHERE c.id=\"" + _usersDBName + "\"");
+            var iterator = _container.GetItemQueryIterator<UserList>(query);
+
+            var usersDocument = new List<UserList>();
+
+            while (iterator.HasMoreResults)
+            {
+                var response = await iterator.ReadNextAsync();
+                usersDocument.AddRange(response);
+            }
+
+            return usersDocument;
+        }
+
+         public async Task<List<PlaylistsDocument>> GetPlaylists()
+        {
+            string databaseName = _databasesDictionary.Keys.First();
+            string containerName = _databasesDictionary.Values.First().First();
+
+            _container = _client.GetContainer(databaseName, containerName);
+
+            //var query = new QueryDefinition("SELECT * FROM c");
+            var query = new QueryDefinition("SELECT * FROM c WHERE c.id=\"" + _playlistsDBName + "\"");
+            var iterator = _container.GetItemQueryIterator<PlaylistsDocument>(query);
+
+            var playlistsDocuments = new List<PlaylistsDocument>();
+
+            while (iterator.HasMoreResults)
+            {
+                var response = await iterator.ReadNextAsync();
+                playlistsDocuments.AddRange(response);
+            }
+
+            return playlistsDocuments;
+        }
+
+
 
         public async Task<List<string>> GetDatabasesListAsync()
         {

@@ -8,7 +8,7 @@ var builder = WebApplication.CreateBuilder(args);
 builder.Services.AddRazorPages();
 
 builder.Services.AddScoped<DBServiceConnector>();
-
+//builder.Services.AddSingleton<IDBServiceConnector, DBServiceConnector>();
 
 var app = builder.Build();
 

@@ -9,55 +9,54 @@ using AikidoLive.Services;
 using AikidoLive.Services.DBConnector;
 using AikidoLive.DataModels;
 
+
+
 namespace AikidoLive.Pages
 {
-    public class LibraryView : PageModel
+    public class Playlists : PageModel
     {
+
         private readonly DBServiceConnector _dbServiceConnector;
-        private readonly ILogger<LibraryView> _logger;
+        private readonly ILogger<Playlists> _logger;
         private readonly IConfiguration _configuration;
         // This property will hold the data for the view
         public List<string> Databases { get; private set; }
-        public List<LibraryDocument> _libDocuments;
+        public List<PlaylistsDocument> _playlistsDocuments;
         
-        public VimeoAPI vimeoAPI;
-
-        public LibraryView(ILogger<LibraryView> logger, DBServiceConnector dbServiceConnector, IConfiguration configuration)
+        public Playlists(ILogger<Playlists> logger, DBServiceConnector dbServiceConnector, IConfiguration configuration)
         {
             _logger = logger;
             _dbServiceConnector = dbServiceConnector;
             _configuration = configuration;
             Databases = new List<string>();
-            _libDocuments = new List<LibraryDocument>();
-            vimeoAPI = new VimeoAPI(configuration);
+            _playlistsDocuments = new List<PlaylistsDocument>();
         }
+
 
         public async Task OnGetAsync()
         {
             var databases = await DBServiceConnector.CreateAsync(_configuration);
             //Databases = databases.GetDatabasesList();
-            _libDocuments = await databases.GetLibraryTitles();
+            _playlistsDocuments = await databases.GetPlaylists();
 
-            if (null != _libDocuments)
+            if (null != _playlistsDocuments)
             {
-                foreach (var docs in _libDocuments)
+                foreach (var docs in _playlistsDocuments)
                 {
-                    foreach (var content in docs.LibraryContents)
+                    foreach (var content in docs.PlaylistsContents)
                     {
-                        foreach (var chapter in content.Chapters)
+                        foreach (var track in content.Tracks)
                         {
-                            if ("vimeo" == chapter.Source)
+                            if ("vimeo" == track.Source)
                             {
-                               // var resp1 = await vimeoAPI.Authorization();
-
-                                //var resp = await vimeoAPI.MakeGetRequest("https://api.vimeo.com/videos/"+chapter.Url+"/pictures");
-                                chapter.Url = "https://player.vimeo.com/video/" + chapter.Url;
+                                track.Url = "https://player.vimeo.com/video/" + track.Url;
                             }
-                            //chapter.Name;
                         }
                     }
                 }
             }
         }
+
+        
     }
 }
