@@ -25,12 +25,12 @@ namespace AikidoLive.Services.DBConnector
             _databasesDictionary = new Dictionary<string, List<string>>();
             _databases = new List<string>();
             var libraryDbSettings = configuration.GetSection("libraryDB");
-            _libraryDbName = libraryDbSettings["document"];
+            _libraryDbName = libraryDbSettings["document"] ?? "";
             var usersDbSettings = configuration.GetSection("usersDB");
-            _usersDBName = usersDbSettings["document"];
+            _usersDBName = usersDbSettings["document"] ?? "";
 
             var playlistsDbSettings = configuration.GetSection("playlistsDB");
-            _playlistsDBName = playlistsDbSettings["document"];
+            _playlistsDBName = playlistsDbSettings["document"] ?? "";
         }
 
         public static async Task<DBServiceConnector> CreateAsync(IConfiguration configuration)

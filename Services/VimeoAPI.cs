@@ -5,27 +5,46 @@ using System.Threading.Tasks;
 using System.Net.Http;
 using System.Net.Http.Headers;
 using Newtonsoft.Json.Linq;
+using System.Security.Cryptography.X509Certificates;
 
 namespace AikidoLive.Services
 {
     public class VimeoAPI
     {
-        private string _clientId;
-        private string _accessToken;
-        private string _accessTokenReturn = "";
-        private string _clientSecret;
-        private string _acceptHeader;
-        private string _versionAPI;
-        private string _userId;
+        private string? _clientId;
+        private string? _accessToken;
+        private string? _accessTokenReturn;
+        private string? _clientSecret;
+        private string? _acceptHeader;
+        private string? _versionAPI;
+        private string? _userId;
+
+        public VimeoAPI()
+        {
+            _clientId = " "!;
+            _accessToken = " "!;
+            _accessTokenReturn = " "!;
+            _clientSecret = " "!;
+            _acceptHeader = " "!;
+            _versionAPI = " "!;
+            _userId = " "!;
+        }
         public VimeoAPI(IConfiguration configuration)
         {
             var vimeoSettings = configuration.GetSection("VimeoAPI");
-            _clientId = vimeoSettings["clientId"];
-            _accessToken = vimeoSettings["AccessToken"];
-            _clientSecret = vimeoSettings["clientSecret"];
-            _acceptHeader = vimeoSettings["acceptHdr"];
-            _versionAPI = vimeoSettings["versionAPI"];
-            _userId = vimeoSettings["userId"];
+            if (vimeoSettings == null)
+            {
+                throw new Exception("VimeoAPI section not found in appsettings.json");
+            }
+            else
+            {
+                _clientId = vimeoSettings["clientId"] ?? "";
+                _accessToken = vimeoSettings["AccessToken"] ?? "";
+                _clientSecret = vimeoSettings["clientSecret"] ?? "";
+                _acceptHeader = vimeoSettings["acceptHdr"] ?? "";
+                _versionAPI = vimeoSettings["versionAPI"] ?? "";
+                _userId = vimeoSettings["userId"] ?? "";
+            }
         }
 
         public async Task<string> Authorization()
@@ -36,7 +55,7 @@ namespace AikidoLive.Services
                 var requestBody = new FormUrlEncodedContent(new[]
                 {
                     new KeyValuePair<string, string>("response_type", "code"),
-                    new KeyValuePair<string, string>("client_id", _clientId),
+                    new KeyValuePair<string, string>("client_id", _clientId ?? ""),
                     new KeyValuePair<string, string>("redirect_uri", "redirectUri"),
                     new KeyValuePair<string, string>("state", "1234567890"),
                     new KeyValuePair<string, string>("scope", "public private unlisted")
@@ -57,10 +76,10 @@ namespace AikidoLive.Services
                         var requestBody1 = new FormUrlEncodedContent(new[]
                         {
                             new KeyValuePair<string, string>("grant_type", "authorization_code"),
-                            new KeyValuePair<string, string>("code", code),
+                            new KeyValuePair<string, string>("code", code ?? ""),
                             new KeyValuePair<string, string>("redirect_uri", "redirectUri"),
-                            new KeyValuePair<string, string>("client_id", _clientId),
-                            new KeyValuePair<string, string>("client_secret", _clientSecret)
+                            new KeyValuePair<string, string>("client_id", _clientId ?? ""),
+                            new KeyValuePair<string, string>("client_secret", _clientSecret ?? "")
                         });
 
                         var response1 = await client1.PostAsync(url, requestBody);
@@ -97,7 +116,7 @@ namespace AikidoLive.Services
             {
                 // Set the Accept header
                 client.DefaultRequestHeaders.Accept.Clear();
-                client.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue(_acceptHeader));
+                client.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue(_acceptHeader ?? ""));
                 client.DefaultRequestHeaders.Add("Accept", _acceptHeader + ";" + _versionAPI);
                 client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", _accessToken);
 
