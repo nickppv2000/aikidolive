@@ -6,21 +6,58 @@
 
 <h1>@ViewData["Title"]</h1>
 
-<ul>
-    @if (null != Model._playlistsDocuments)
+@if (null != Model._playlistsDocuments)
+{
+    var settings = new Newtonsoft.Json.JsonSerializerSettings { Formatting = Newtonsoft.Json.Formatting.None };
+    <select id="PlaylistsContents" onchange="handleSelectionChange(this)">
+    @foreach (var docs in Model._playlistsDocuments)
     {
-        @foreach (var docs in Model._playlistsDocuments)
+        @foreach (var content in docs.PlaylistsContents)
         {
-            @foreach (var content in docs.PlaylistsContents)
-            {
-                <li>@content.PlaylistName</li>
-                @foreach (var track in content.Tracks)
-                {
-                    <ul>
-                        <li><a href=@track.Url>@track.Name: @track.Description</a></li>
-                    </ul>
-                }
-            }
+            <option value="@content.PlaylistName" data-tracks="@Newtonsoft.Json.JsonConvert.SerializeObject(content.Tracks, settings)">@content.PlaylistName</option>
         }
     }
-</ul>
+    </select>
+    
+}
+
+<div id="trackList"></div>
+
+
+<script>
+    function handleSelectionChange(selectElement) 
+    {
+        var selectedValue = selectElement.value;
+        var selectedOption = selectElement.options[selectElement.selectedIndex];
+        var tracks;
+        console.log(selectedOption.dataset.tracks);
+        try {
+            tracks = JSON.parse(selectedOption.dataset.tracks);
+        } catch (error) {
+            console.error('Error parsing data-tracks:', error);
+            return;
+        }
+        var trackList = document.getElementById('trackList');
+        trackList.innerHTML = '';
+        
+        var ul = document.createElement('ul');
+        ul.style.listStyleType = 'disc';
+
+        tracks.forEach(track => {
+            var li = document.createElement('li');
+            var a = document.createElement('a');
+            a.href = track.Url;
+            a.textContent = track.Name;
+            li.appendChild(a);
+            ul.appendChild(li);
+        });
+
+        trackList.appendChild(ul);
+    }
+
+    // Call handleSelectionChange when the page loads
+    window.onload = function() {
+        var selectElement = document.getElementById('PlaylistsContents');
+        handleSelectionChange(selectElement);
+    }
+</script>
