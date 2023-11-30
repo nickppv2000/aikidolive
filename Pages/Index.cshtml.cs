@@ -24,8 +24,6 @@ public class IndexModel : PageModel
 
     public async Task OnGetAsync()
     {
-        var databases = await DBServiceConnector.CreateAsync(_configuration);
-
-        _libUserList = await databases.GetUsers();
+        _libUserList = await _dbServiceConnector.GetUsers();
     }
 }

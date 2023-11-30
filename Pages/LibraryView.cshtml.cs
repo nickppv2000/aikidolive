@@ -34,9 +34,7 @@ namespace AikidoLive.Pages
 
         public async Task OnGetAsync()
         {
-            var databases = await DBServiceConnector.CreateAsync(_configuration);
-            //Databases = databases.GetDatabasesList();
-            _libDocuments = await databases.GetLibraryTitles();
+            _libDocuments = await _dbServiceConnector.GetLibraryTitles();
 
             if (null != _libDocuments)
             {

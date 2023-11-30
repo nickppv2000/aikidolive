@@ -7,7 +7,7 @@ using AikidoLive.DataModels;
 
 namespace AikidoLive.Services.DBConnector
 {
-    public class DBServiceConnector
+    public class DBServiceConnector : IDisposable
     {
         private readonly CosmosClient _client;
         private Container? _container;
@@ -18,10 +18,10 @@ namespace AikidoLive.Services.DBConnector
         private string _usersDBName;
         private string _playlistsDBName;
 
-        public DBServiceConnector(IConfiguration configuration)
+        public DBServiceConnector(IConfiguration configuration, CosmosClient client)
         {
-            var cosmosDbSettings = configuration.GetSection("CosmosDb");
-            _client = new CosmosClient(cosmosDbSettings["Account"], cosmosDbSettings["Key"]);
+            _client = client;
+            
             _databasesDictionary = new Dictionary<string, List<string>>();
             _databases = new List<string>();
             var libraryDbSettings = configuration.GetSection("libraryDB");
@@ -31,11 +31,18 @@ namespace AikidoLive.Services.DBConnector
 
             var playlistsDbSettings = configuration.GetSection("playlistsDB");
             _playlistsDBName = playlistsDbSettings["document"] ?? "";
+
+            _databases = GetDatabasesListAsync().GetAwaiter().GetResult();
         }
 
-        public static async Task<DBServiceConnector> CreateAsync(IConfiguration configuration)
+        public void Dispose()
         {
-            var connector = new DBServiceConnector(configuration);
+
+        }
+
+        public static async Task<DBServiceConnector> CreateAsync(IConfiguration configuration, CosmosClient client)
+        {
+            var connector = new DBServiceConnector(configuration, client);
             connector._databases = await connector.GetDatabasesListAsync();
             return connector;
         }

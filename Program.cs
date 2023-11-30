@@ -8,7 +8,13 @@ var builder = WebApplication.CreateBuilder(args);
 builder.Services.AddRazorPages();
 
 builder.Services.AddScoped<DBServiceConnector>();
-//builder.Services.AddSingleton<IDBServiceConnector, DBServiceConnector>();
+builder.Services.AddSingleton(x => 
+{
+    var cosmosDbConfig = builder.Configuration.GetSection("CosmosDb");
+    var account = cosmosDbConfig["Account"];
+    var key = cosmosDbConfig["Key"];
+    return new CosmosClient(account, key);
+});
 
 var app = builder.Build();
 
