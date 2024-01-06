@@ -22,7 +22,19 @@
                 <!-- <img src="/img/logo.png" alt="sample logo">
             <!-- Company Logo text --> 
             K</div></a>
-            <div id="headerLinks"><a href="#" title="Login">Login</a></div>
+
+            @if (User.Identity.IsAuthenticated)
+            {
+                <div id="headerLinks"><h3>Hello </h3> - <a href="/Logout" title="Logout">Logout</a></div>
+                
+            }
+            else
+            {
+                <div id="headerLinks"><a href="/Login" title="Login">Login</a></div>
+                <div id="headerLinks"><a href="/Register" title="Register">Register</a></div>
+            }
+
+            
             
         </header>
         <section id="offer"> 

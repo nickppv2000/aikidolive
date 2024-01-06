@@ -4,6 +4,8 @@ using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.Azure.Cosmos;
 using AikidoLive.DataModels;
+using Microsoft.AspNetCore.Identity;
+using Newtonsoft.Json;
 
 namespace AikidoLive.Services.DBConnector
 {
@@ -40,6 +42,11 @@ namespace AikidoLive.Services.DBConnector
 
         }
 
+        public CosmosClient getDbClientContext()
+        {
+            return _client;
+        }
+
         public static async Task<DBServiceConnector> CreateAsync(IConfiguration configuration, CosmosClient client)
         {
             var connector = new DBServiceConnector(configuration, client);
@@ -72,6 +79,65 @@ namespace AikidoLive.Services.DBConnector
             }
 
             return libraryDocuments;
+        }
+
+        public async Task<Task<IdentityResult>> CreateUser(IdentityUser user)
+        {
+            string databaseName = _databasesDictionary.Keys.First();
+            string containerName = _databasesDictionary.Values.First().First();
+
+            _container = _client.GetContainer(databaseName, containerName);
+
+            var query = new QueryDefinition("SELECT * FROM c WHERE c.id=\"" + _usersDBName + "\"");
+            //var iterator = _container.GetItemQueryIterator<UserList>(query);
+
+            /*var usersDocument = new List<UserList>();
+
+            while (iterator.HasMoreResults)
+            {
+                var response = await iterator.ReadNextAsync();
+                if (response.Count == 0)
+                {
+                    var usrList = new UserList(_usersDBName, new List<AikidoLive.DataModels.User>());
+                    usersDocument.Add(usrList);
+                    break;
+                }
+                else
+                {
+                    usersDocument.AddRange(response);
+                }
+            }
+
+            var userList = usersDocument.First();*/
+            //var userList = new UserList(_usersDBName, new List<AikidoLive.DataModels.User>());
+
+            //userList.Users.Add(new AikidoLive.DataModels.User(user));
+
+            var usr = new AikidoLive.DataModels.User(user);
+
+            try
+            {
+                Console.WriteLine($"Upserting item: {JsonConvert.SerializeObject(usr)}");
+                Console.WriteLine($"Partition key: {user.Id}");
+
+
+                ItemResponse<AikidoLive.DataModels.User> createUserResponse = await _container.UpsertItemAsync(usr, new PartitionKey(user.Id));
+                return Task.FromResult(IdentityResult.Success);
+            }
+            catch (CosmosException ex) // CosmosDB-specific exception
+            {
+                Console.WriteLine(ex.Message);
+                // Log the error or do something with it
+                return Task.FromResult(IdentityResult.Failed(new IdentityError { Description = $"Could not create user: {ex.Message}" }));
+            }
+            catch (Exception ex) // Anything else
+            {
+                // Log the error or do something with it
+                Console.WriteLine(ex.Message);
+                return Task.FromResult(IdentityResult.Failed(new IdentityError { Description = $"Could not create user: {ex.Message}" }));
+            }
+
+            return Task.FromResult(IdentityResult.Success);
         }
 
         public async Task<List<UserList>> GetUsers()

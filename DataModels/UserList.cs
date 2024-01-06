@@ -10,13 +10,13 @@ namespace AikidoLive.DataModels
         public string Id { get; set; }
         public List<User> Users { get; set; }
 
-        UserList()
+        public UserList()
         {
             Id = "";
             Users = new List<User>();
         }
 
-        UserList(string id, List<User> users)
+        public UserList(string id, List<User> users)
         {
             Id = id;
             Users = users;

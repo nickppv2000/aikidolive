@@ -1,6 +1,7 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 
+using AikidoLive.Services;
 using AikidoLive.Services.DBConnector;
 using AikidoLive.DataModels;
 
@@ -12,18 +13,20 @@ public class IndexModel : PageModel
 
     private readonly DBServiceConnector _dbServiceConnector;    
     private readonly IConfiguration _configuration;
-    public List<UserList> _libUserList;
+    private readonly UserService _userService;
 
-    public IndexModel(ILogger<IndexModel> logger, DBServiceConnector dbServiceConnector, IConfiguration configuration)
+    
+
+    public IndexModel(ILogger<IndexModel> logger, DBServiceConnector dbServiceConnector, IConfiguration configuration, UserService userService)
     {
         _logger = logger;
         _dbServiceConnector = dbServiceConnector;
         _configuration = configuration;
-        _libUserList = new List<UserList>();
+        _userService = userService;
     }
 
     public async Task OnGetAsync()
     {
-        _libUserList = await _dbServiceConnector.GetUsers();
+        
     }
 }
