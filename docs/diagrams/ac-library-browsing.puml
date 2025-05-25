@@ -1,0 +1,45 @@
+@startuml ac-library-browsing
+
+
+title Library Content Browsing Activity
+
+start
+
+:User navigates to Library section;
+:Load Libraries from Cosmos DB;
+
+if (Libraries available?) then (yes)
+  :Display Libraries to user;
+  :User selects library;
+  :Load Chapters for selected library;
+  
+  if (Chapters available?) then (yes)
+    :Display Chapters to user;
+    :User selects chapter;
+    :Retrieve chapter details;
+    
+    if (Video content?) then (yes)
+      :Process Vimeo URL;
+      :Construct embed URL;
+      :Embed video player;
+    else (no)
+      :Display text content;
+    endif
+    
+    :User views content;
+  else (no)
+    :Display "No chapters found" message;
+  endif
+else (no)
+  :Display "No libraries available" message;
+endif
+
+stop
+
+note right
+  This activity handles the complete
+  workflow for browsing and accessing
+  library content including error cases
+end note
+
+@enduml

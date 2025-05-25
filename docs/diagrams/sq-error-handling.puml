@@ -1,0 +1,57 @@
+@startuml sq-error-handling
+
+
+title Error Handling Sequence
+
+actor User
+participant "Web\nApplication" as App
+participant "Error\nHandler" as Handler
+participant "Logger" as Log
+participant "Error\nPage" as ErrorPage
+
+User -> App: HTTP Request
+activate App
+
+App -> App: Process request
+
+alt Exception occurs
+  App -> App: Throw exception
+  App -> Handler: Exception caught
+  activate Handler
+  
+  Handler -> Log: LogError(exception)
+  activate Log
+  Log -> Log: Write to log file
+  Log --> Handler: Logged
+  deactivate Log
+  
+  Handler -> Handler: Determine error type
+  
+  alt Critical error
+    Handler -> Handler: Send admin notification
+  end
+  
+  Handler -> ErrorPage: Render error page
+  activate ErrorPage
+  ErrorPage -> ErrorPage: Generate user-friendly message
+  ErrorPage --> Handler: Error HTML
+  deactivate ErrorPage
+  
+  Handler --> App: Error response
+  deactivate Handler
+  
+  App --> User: HTTP 500 + Error page
+else Normal processing
+  App -> App: Generate response
+  App --> User: HTTP 200 + Content
+end
+
+deactivate App
+
+note right of User
+  User sees friendly error
+  message while system logs
+  details for debugging
+end note
+
+@enduml

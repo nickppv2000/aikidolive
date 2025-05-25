@@ -1,0 +1,39 @@
+@startuml uc-video-integration
+
+
+title Video Content Integration Use Case
+
+left to right direction
+
+actor "User" as user
+actor "Vimeo API" as vimeo
+
+rectangle "Aikido Live System" {
+  usecase "Request Video Content" as UC1
+  usecase "Retrieve Video Metadata" as UC2
+  usecase "Construct Player URL" as UC3
+  usecase "Embed Video Player" as UC4
+  usecase "Authorize API Access" as UC5
+  
+  UC1 ..> UC2 : <<include>>
+  UC2 ..> UC3 : <<include>>
+  UC3 ..> UC4 : <<include>>
+  UC2 ..> UC5 : <<extend>>
+}
+
+user --> UC1
+UC5 --> vimeo
+UC4 --> vimeo
+
+note right of UC1
+  System seamlessly integrates
+  with Vimeo to provide video
+  content to users
+end note
+
+note bottom of UC5
+  API authorization may be
+  required for certain operations
+end note
+
+@enduml

@@ -1,0 +1,44 @@
+@startuml sq-library-access
+
+
+title Library Content Access Sequence
+
+actor User
+participant "LibraryView\nPage" as LV
+participant "DBServiceConnector" as DB
+participant "Azure Cosmos DB" as CosmosDB
+participant "VimeoAPI" as Vimeo
+
+User -> LV: GET /LibraryView
+activate LV
+
+LV -> LV: OnGetAsync()
+LV -> DB: GetLibraryTitles()
+activate DB
+
+DB -> CosmosDB: Query library documents
+activate CosmosDB
+CosmosDB --> DB: Return library data
+deactivate CosmosDB
+
+DB --> LV: List<LibraryDocument>
+deactivate DB
+
+loop for each chapter
+  alt chapter.Source == "vimeo"
+    LV -> Vimeo: Construct player URL
+    Vimeo --> LV: Player URL
+  end
+end
+
+LV -> LV: Render page with videos
+LV --> User: HTML with embedded videos
+deactivate LV
+
+note right of User
+  User can now view
+  library content with
+  embedded video players
+end note
+
+@enduml

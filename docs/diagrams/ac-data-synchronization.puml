@@ -1,0 +1,55 @@
+@startuml ac-data-synchronization
+
+
+title Data Synchronization Activity
+
+start
+
+:Trigger data synchronization;
+:Initialize Vimeo API client;
+
+if (API credentials valid?) then (yes)
+  :Authenticate with Vimeo API;
+  
+  if (Authentication successful?) then (yes)
+    :Retrieve video folders;
+    :Process folder metadata;
+    
+    fork
+      :Update library content;
+    fork again
+      :Update playlist content;
+    fork again
+      :Update video metadata;
+    end fork
+    
+    :Validate data integrity;
+    :Update Cosmos DB;
+    
+    if (Database update successful?) then (yes)
+      :Log synchronization success;
+    else (no)
+      :Log database error;
+      :Rollback changes;
+    endif
+    
+  else (no)
+    :Log authentication failure;
+    :Schedule retry;
+  endif
+  
+else (no)
+  :Log credential error;
+  :Send admin notification;
+endif
+
+:Clean up resources;
+stop
+
+note right
+  Data synchronization ensures
+  content is up-to-date with
+  external video sources
+end note
+
+@enduml
