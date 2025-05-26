@@ -1,0 +1,196 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Final Mobile Menu Test</title>
+    <link rel="stylesheet" href="/css/modern-styles.css">
+    <style>
+        /* Console output window */
+        .console-output {
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            height: 200px;
+            background: rgba(0,0,0,0.95);
+            color: lime;
+            font-family: 'Courier New', monospace;
+            font-size: 11px;
+            padding: 10px;
+            overflow-y: auto;
+            z-index: 99999;
+            border-top: 2px solid lime;
+        }
+        
+        .console-output .log-entry {
+            margin-bottom: 2px;
+        }
+        
+        .console-output .log-entry.error {
+            color: red;
+        }
+        
+        .console-output .log-entry.warn {
+            color: yellow;
+        }
+        
+        .console-output .log-entry.info {
+            color: cyan;
+        }
+        
+        /* Test controls */
+        .test-controls {
+            position: fixed;
+            top: 10px;
+            right: 10px;
+            background: rgba(255,255,255,0.9);
+            padding: 10px;
+            border-radius: 5px;
+            z-index: 9998;
+        }
+        
+        /* Force mobile view */
+        @media (max-width: 768px) {
+            .mobile-menu-toggle {
+                display: flex !important;
+            }
+        }
+        
+        /* Also force for testing */
+        .mobile-menu-toggle {
+            display: flex !important;
+            background: rgba(255, 0, 0, 0.3) !important;
+            border: 2px solid yellow !important;
+        }
+    </style>
+</head>
+<body>
+    <div class="test-controls">
+        <button onclick="clearConsole()">Clear Console</button>
+        <button onclick="testMobileMenu()">Test Menu</button>
+        <button onclick="checkElements()">Check Elements</button>
+    </div>
+
+    <div class="console-output" id="consoleOutput">
+        <div class="log-entry info">Final Mobile Menu Test - Console Output</div>
+    </div>
+
+    <header class="modern-header">
+        <div class="container">
+            <div class="header-content">
+                <a href="/" class="logo-modern">
+                    <div class="logo-icon">合</div>
+                    <span>Aikido Library</span>
+                </a>
+                
+                <!-- Mobile Menu Button -->
+                <button class="mobile-menu-toggle" aria-label="Toggle navigation menu" aria-expanded="false">
+                    <span class="hamburger-line"></span>
+                    <span class="hamburger-line"></span>
+                    <span class="hamburger-line"></span>
+                </button>
+                
+                <nav class="nav-container">
+                    <ul class="nav-modern">
+                        <li><a href="/" title="Home">🏠 Home</a></li>
+                        <li><a href="/library-titles" title="Library">📚 Library</a></li>
+                        <li><a href="/LibraryView" title="Library View">👁️ Browse</a></li>
+                        <li><a href="/Playlists" title="Playlists">🎵 Playlists</a></li>
+                        <li><a href="/Blog" title="Blog">✍️ Blog</a></li>
+                        <li><a href="#" title="Login" class="btn btn-secondary">🔑 Login</a></li>
+                    </ul>
+                </nav>
+            </div>
+        </div>
+    </header>
+
+    <main style="padding: 2rem; margin-top: 100px; margin-bottom: 220px;">
+        <h1>Final Mobile Menu Test</h1>
+        <p>This test includes the actual JavaScript and shows console output on the page.</p>
+        <p>Click the hamburger menu (red background with yellow border) to test.</p>
+        <p>Watch the console output below for debugging information.</p>
+    </main>
+
+    <script>
+        // Intercept console messages and display them on page
+        let originalLog = console.log;
+        let originalWarn = console.warn;
+        let originalError = console.error;
+        
+        function addToConsole(message, type = 'log') {
+            const timestamp = new Date().toLocaleTimeString();
+            const entry = document.createElement('div');
+            entry.className = `log-entry ${type}`;
+            entry.textContent = `[${timestamp}] ${message}`;
+            
+            const output = document.getElementById('consoleOutput');
+            output.appendChild(entry);
+            output.scrollTop = output.scrollHeight;
+        }
+        
+        console.log = function(...args) {
+            originalLog.apply(console, args);
+            addToConsole(args.join(' '), 'info');
+        };
+        
+        console.warn = function(...args) {
+            originalWarn.apply(console, args);
+            addToConsole(args.join(' '), 'warn');
+        };
+        
+        console.error = function(...args) {
+            originalError.apply(console, args);
+            addToConsole(args.join(' '), 'error');
+        };
+        
+        function clearConsole() {
+            document.getElementById('consoleOutput').innerHTML = '<div class="log-entry info">Console cleared</div>';
+        }
+        
+        function testMobileMenu() {
+            const toggle = document.querySelector('.mobile-menu-toggle');
+            if (toggle) {
+                console.log('Manual test: Triggering click on mobile menu toggle');
+                toggle.click();
+            } else {
+                console.error('Manual test: Mobile menu toggle not found!');
+            }
+        }
+        
+        function checkElements() {
+            const toggle = document.querySelector('.mobile-menu-toggle');
+            const container = document.querySelector('.nav-container');
+            const nav = document.querySelector('.nav-modern');
+            
+            console.log('Element check results:');
+            console.log('- Toggle button:', !!toggle);
+            console.log('- Nav container:', !!container);
+            console.log('- Nav modern:', !!nav);
+            
+            if (toggle) {
+                const toggleDisplay = window.getComputedStyle(toggle).display;
+                console.log('- Toggle display:', toggleDisplay);
+            }
+            
+            if (nav) {
+                const navDisplay = window.getComputedStyle(nav).display;
+                console.log('- Nav display:', navDisplay);
+            }
+            
+            if (container) {
+                console.log('- Container classes:', container.className);
+            }
+        }
+        
+        // Log initial page load
+        document.addEventListener('DOMContentLoaded', function() {
+            console.log('DOM Content Loaded - Final test page ready');
+            setTimeout(checkElements, 1000); // Check elements after other scripts load
+        });
+    </script>
+    
+    <!-- Load the actual JavaScript file -->
+    <script src="/js/modern-interactions.js"></script>
+</body>
+</html>

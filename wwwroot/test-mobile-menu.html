@@ -1,0 +1,125 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Mobile Menu Test</title>
+    <link rel="stylesheet" href="/css/modern-styles.css">
+    <style>
+        /* Debug styles to help visualize the mobile menu */
+        .mobile-menu-toggle {
+            border: 1px solid rgba(255,255,255,0.3) !important;
+            background: rgba(255,255,255,0.1) !important;
+        }
+        
+        .nav-container {
+            border: 1px solid rgba(255,255,0,0.5) !important;
+        }
+        
+        /* Force mobile view for all screen sizes for testing */
+        .mobile-menu-toggle {
+            display: flex !important;
+        }
+        
+        /* Hide desktop nav completely for testing */
+        .nav-modern {
+            display: none !important;
+        }
+        
+        /* Show nav when active */
+        .nav-container.active .nav-modern {
+            display: flex !important;
+        }
+        
+        /* Make the nav container more visible */
+        .nav-container.active {
+            background: var(--primary-color) !important;
+            border: 2px solid yellow !important;
+        }
+        
+        .debug-info {
+            position: fixed;
+            top: 10px;
+            left: 10px;
+            background: rgba(0,0,0,0.8);
+            color: white;
+            padding: 10px;
+            border-radius: 5px;
+            font-size: 12px;
+            z-index: 9999;
+        }
+    </style>
+</head>
+<body>
+    <div class="debug-info" id="debugInfo">
+        Mobile Menu Test<br>
+        Toggle State: <span id="toggleState">inactive</span><br>
+        Container State: <span id="containerState">hidden</span><br>
+        Screen Width: <span id="screenWidth"></span>px
+    </div>
+
+    <header class="modern-header">
+        <div class="container">
+            <div class="header-content">
+                <a href="/" class="logo-modern">
+                    <div class="logo-icon">合</div>
+                    <span>Aikido Library</span>
+                </a>
+                
+                <!-- Mobile Menu Button -->
+                <button class="mobile-menu-toggle" aria-label="Toggle navigation menu" aria-expanded="false">
+                    <span class="hamburger-line"></span>
+                    <span class="hamburger-line"></span>
+                    <span class="hamburger-line"></span>
+                </button>
+                
+                <nav class="nav-container">
+                    <ul class="nav-modern">
+                        <li><a href="/" title="Home">Home</a></li>
+                        <li><a href="/library-titles" title="Library">Library</a></li>
+                        <li><a href="/LibraryView" title="Library View">Browse</a></li>
+                        <li><a href="/Playlists" title="Playlists">Playlists</a></li>
+                        <li><a href="/Blog" title="Blog">Blog</a></li>
+                        <li><a href="#" title="Login" class="btn btn-secondary">Login</a></li>
+                    </ul>
+                </nav>
+            </div>
+        </div>
+    </header>
+
+    <main style="padding: 2rem;">
+        <h1>Mobile Menu Test Page</h1>
+        <p>Click the hamburger menu button in the top right to test the mobile navigation.</p>
+        <p>The menu should slide down and show navigation items.</p>
+    </main>
+
+    <script>
+        // Debug information updater
+        function updateDebugInfo() {
+            const toggleState = document.querySelector('.mobile-menu-toggle').classList.contains('active') ? 'active' : 'inactive';
+            const containerState = document.querySelector('.nav-container').classList.contains('active') ? 'visible' : 'hidden';
+            const screenWidth = window.innerWidth;
+            
+            document.getElementById('toggleState').textContent = toggleState;
+            document.getElementById('containerState').textContent = containerState;
+            document.getElementById('screenWidth').textContent = screenWidth;
+        }
+        
+        // Update debug info initially and on resize
+        document.addEventListener('DOMContentLoaded', updateDebugInfo);
+        window.addEventListener('resize', updateDebugInfo);
+        
+        // Monitor clicks on the mobile toggle
+        document.addEventListener('DOMContentLoaded', function() {
+            const toggle = document.querySelector('.mobile-menu-toggle');
+            if (toggle) {
+                toggle.addEventListener('click', function() {
+                    setTimeout(updateDebugInfo, 50); // Slight delay to catch state changes
+                });
+            }
+        });
+    </script>
+    
+    <script src="/js/modern-interactions.js"></script>
+</body>
+</html>

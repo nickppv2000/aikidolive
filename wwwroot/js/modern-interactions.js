@@ -1,10 +1,44 @@
 // Modern Aikido Library Interactions
 document.addEventListener('DOMContentLoaded', function() {
-    // Initialize modern interactions
-    initializeAnimations();
-    initializeSearch();
-    initializeResponsiveMenu();
-    initializeScrollEffects();
+    console.log('Aikido Library: Initializing modern interactions...');
+    
+    // Initialize modern interactions with error handling
+    try {
+        initializeAnimations();
+        console.log('Aikido Library: Animations initialized');
+    } catch (error) {
+        console.warn('Aikido Library: Animation initialization failed:', error);
+    }
+    
+    try {
+        initializeSearch();
+        console.log('Aikido Library: Search initialized');
+    } catch (error) {
+        console.warn('Aikido Library: Search initialization failed:', error);
+    }
+    
+    try {
+        initializeResponsiveMenu();
+        console.log('Aikido Library: Responsive menu initialized');
+    } catch (error) {
+        console.warn('Aikido Library: Responsive menu initialization failed:', error);
+    }
+    
+    try {
+        initializeScrollEffects();
+        console.log('Aikido Library: Scroll effects initialized');
+    } catch (error) {
+        console.warn('Aikido Library: Scroll effects initialization failed:', error);
+    }
+    
+    try {
+        enhanceForms();
+        console.log('Aikido Library: Forms enhanced');
+    } catch (error) {
+        console.warn('Aikido Library: Form enhancement failed:', error);
+    }
+    
+    console.log('Aikido Library: All initializations complete');
 });
 
 // Animation observers
@@ -120,13 +154,26 @@ function hideSearchFeedback() {
 
 // Responsive menu handling
 function initializeResponsiveMenu() {
+    console.log('Mobile Menu: Starting initialization...');
+    
     const menuToggle = document.querySelector('.mobile-menu-toggle');
     const navContainer = document.querySelector('.nav-container');
     
-    if (!menuToggle || !navContainer) return;
+    console.log('Mobile Menu: Toggle element found:', !!menuToggle);
+    console.log('Mobile Menu: Container element found:', !!navContainer);
+      if (!menuToggle || !navContainer) {
+        console.warn('Mobile menu elements not found - toggle:', !!menuToggle, 'container:', !!navContainer);
+        return;
+    }
+    
+    console.log('Mobile Menu: Adding click listener...');
       // Toggle mobile menu
-    menuToggle.addEventListener('click', function() {
+    menuToggle.addEventListener('click', function(e) {
+        e.preventDefault();
+        console.log('Mobile Menu: Toggle clicked!');
+        
         const isActive = this.classList.contains('active');
+        console.log('Mobile Menu: Was active:', isActive);
         
         if (isActive) {
             // Close menu
@@ -134,15 +181,25 @@ function initializeResponsiveMenu() {
             navContainer.classList.remove('active');
             this.setAttribute('aria-expanded', 'false');
             document.body.classList.remove('mobile-menu-open');
+            console.log('Mobile Menu: Menu closed');
         } else {
             // Open menu
             this.classList.add('active');
             navContainer.classList.add('active');
             this.setAttribute('aria-expanded', 'true');
             document.body.classList.add('mobile-menu-open');
+            console.log('Mobile Menu: Menu opened');
         }
+        
+        // Log final state after a brief delay
+        setTimeout(() => {
+            const finalActive = this.classList.contains('active');
+            const navDisplay = window.getComputedStyle(document.querySelector('.nav-modern')).display;
+            console.log('Mobile Menu: Final state - Active:', finalActive, 'Nav display:', navDisplay);
+        }, 100);
     });
-      // Close menu when clicking on a nav link
+    
+    // Close menu when clicking on a nav link
     const navLinks = document.querySelectorAll('.nav-modern a');
     navLinks.forEach(link => {
         link.addEventListener('click', function() {
@@ -284,14 +341,8 @@ function enhanceForms() {
     });
 }
 
-// Initialize form enhancements
-document.addEventListener('DOMContentLoaded', enhanceForms);
-
-// Initialize responsive menu
-document.addEventListener('DOMContentLoaded', initializeResponsiveMenu);
-
-// Initialize scroll effects
-document.addEventListener('DOMContentLoaded', initializeScrollEffects);
+// Note: These functions are already called in the main DOMContentLoaded listener above
+// Removing duplicate event listeners to prevent conflicts
 
 // Accessibility improvements
 document.addEventListener('DOMContentLoaded', function() {

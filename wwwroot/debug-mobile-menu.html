@@ -1,0 +1,140 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Mobile Menu Debug</title>
+    <link rel="stylesheet" href="/css/modern-styles.css">
+    <style>
+        body { margin: 0; padding: 20px; background: #f0f0f0; }
+        .debug-panel {
+            position: fixed;
+            top: 10px;
+            right: 10px;
+            background: rgba(0,0,0,0.9);
+            color: white;
+            padding: 15px;
+            border-radius: 8px;
+            font-family: monospace;
+            font-size: 12px;
+            z-index: 10000;
+            max-width: 300px;
+        }
+        .mobile-menu-toggle {
+            background: red !important;
+            border: 2px solid yellow !important;
+        }
+        /* Force mobile styles for testing */
+        @media (min-width: 1px) {
+            .mobile-menu-toggle {
+                display: flex !important;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="debug-panel" id="debugPanel">
+        <div><strong>Mobile Menu Debug</strong></div>
+        <div>Toggle Element: <span id="toggleFound">-</span></div>
+        <div>Nav Container: <span id="navFound">-</span></div>
+        <div>Toggle Visible: <span id="toggleVisible">-</span></div>
+        <div>JS Loaded: <span id="jsLoaded">-</span></div>
+        <div>Click Count: <span id="clickCount">0</span></div>
+        <div>Active State: <span id="activeState">-</span></div>
+        <div>Screen Width: <span id="screenWidth">-</span></div>
+    </div>
+
+    <header class="modern-header">
+        <div class="container">
+            <div class="header-content">
+                <a href="/" class="logo-modern">
+                    <div class="logo-icon">合</div>
+                    <span>Aikido Library</span>
+                </a>
+                
+                <!-- Mobile Menu Button -->
+                <button class="mobile-menu-toggle" aria-label="Toggle navigation menu" aria-expanded="false" id="mobileToggle">
+                    <span class="hamburger-line"></span>
+                    <span class="hamburger-line"></span>
+                    <span class="hamburger-line"></span>
+                </button>
+                
+                <nav class="nav-container" id="navContainer">
+                    <ul class="nav-modern">
+                        <li><a href="/" title="Home">Home</a></li>
+                        <li><a href="/library-titles" title="Library">Library</a></li>
+                        <li><a href="/LibraryView" title="Library View">Browse</a></li>
+                        <li><a href="/Playlists" title="Playlists">Playlists</a></li>
+                        <li><a href="/Blog" title="Blog">Blog</a></li>
+                        <li><a href="#" title="Login" class="btn btn-secondary">Login</a></li>
+                    </ul>
+                </nav>
+            </div>
+        </div>
+    </header>
+
+    <main style="padding: 2rem; margin-top: 2rem;">
+        <h1>Mobile Menu Debug Page</h1>
+        <p>This page tests the mobile menu functionality with detailed debugging information.</p>
+        <button onclick="testMenuManually()" style="padding: 10px 20px; background: #007cba; color: white; border: none; border-radius: 5px;">Test Menu Manually</button>
+    </main>
+
+    <script>
+        let clickCount = 0;
+        
+        function updateDebugInfo() {
+            const toggle = document.querySelector('.mobile-menu-toggle');
+            const nav = document.querySelector('.nav-container');
+            
+            document.getElementById('toggleFound').textContent = toggle ? 'YES' : 'NO';
+            document.getElementById('navFound').textContent = nav ? 'YES' : 'NO';
+            document.getElementById('toggleVisible').textContent = toggle ? 
+                (getComputedStyle(toggle).display !== 'none' ? 'YES' : 'NO') : 'NO';
+            document.getElementById('activeState').textContent = toggle ? 
+                (toggle.classList.contains('active') ? 'ACTIVE' : 'INACTIVE') : 'NO TOGGLE';
+            document.getElementById('screenWidth').textContent = window.innerWidth;
+            document.getElementById('clickCount').textContent = clickCount;
+        }
+        
+        function testMenuManually() {
+            const toggle = document.querySelector('.mobile-menu-toggle');
+            const nav = document.querySelector('.nav-container');
+            
+            if (toggle && nav) {
+                clickCount++;
+                const isActive = toggle.classList.contains('active');
+                
+                if (isActive) {
+                    toggle.classList.remove('active');
+                    nav.classList.remove('active');
+                } else {
+                    toggle.classList.add('active');
+                    nav.classList.add('active');
+                }
+                
+                updateDebugInfo();
+                console.log('Manual test - Toggle active:', !isActive);
+            }
+        }
+        
+        document.addEventListener('DOMContentLoaded', function() {
+            document.getElementById('jsLoaded').textContent = 'YES';
+            updateDebugInfo();
+            
+            // Monitor the actual toggle button
+            const toggle = document.querySelector('.mobile-menu-toggle');
+            if (toggle) {
+                toggle.addEventListener('click', function() {
+                    clickCount++;
+                    console.log('Toggle clicked!', clickCount);
+                    setTimeout(updateDebugInfo, 100);
+                });
+            }
+            
+            window.addEventListener('resize', updateDebugInfo);
+        });
+    </script>
+    
+    <script src="/js/modern-interactions.js"></script>
+</body>
+</html>
