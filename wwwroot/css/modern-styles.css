@@ -689,12 +689,15 @@ body.mobile-menu-open {
     height: 32px;
     font-size: 1rem;
   }
-  
-  /* Show mobile menu toggle */
+    /* Show mobile menu toggle */
   .mobile-menu-toggle {
     display: flex;
   }
-  /* Hide desktop navigation and make it a dropdown */
+    /* Hide desktop navigation and make it a dropdown */
+  .nav-modern {
+    display: none !important; /* Hide desktop nav by default on mobile - use !important for specificity */
+  }
+  
   .nav-container {
     position: absolute;
     top: 100%;
@@ -711,14 +714,14 @@ body.mobile-menu-open {
     max-height: 0;
     overflow: hidden;
   }
-  
   .nav-container.active {
     transform: translateY(0);
     opacity: 1;
     visibility: visible;
     max-height: 400px; /* Adjust based on content */
   }
-    .nav-modern {
+    .nav-container.active .nav-modern {
+    display: flex !important; /* Show nav when menu is active - use !important for specificity */
     flex-direction: column;
     gap: 0;
     width: 100%;
