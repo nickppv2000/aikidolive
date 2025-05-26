@@ -1,0 +1,66 @@
+@startuml arch-component-diagram
+
+
+title Component Architecture Diagram
+
+package "Web Application" {
+  component [Program.cs] as program
+  component [Startup Configuration] as startup
+  component [Middleware Pipeline] as middleware
+  
+  package "Pages" {
+    component [LibraryView] as libview
+    component [Playlists] as playlists
+    component [Index] as index
+    component [Error] as error
+  }
+  
+  package "Services" {
+    component [DBServiceConnector] as dbservice
+    component [VimeoAPI] as vimeoservice
+  }
+  
+  package "Data Models" {
+    component [LibraryDocument] as libdoc
+    component [PlaylistsDocument] as playlistdoc
+    component [UserList] as userlist
+    component [Chapter] as chapter
+    component [Track] as track
+  }
+}
+
+package "External Systems" {
+  database "Azure Cosmos DB" as cosmosdb
+  cloud "Vimeo API" as vimeoapi
+}
+
+package "Infrastructure" {
+  component [Configuration System] as config
+  component [Dependency Injection] as di
+  component [Logging] as logging
+}
+
+' Component relationships
+program --> startup : configures
+startup --> middleware : sets up
+startup --> di : registers services
+di --> dbservice : injects
+di --> vimeoservice : injects
+libview --> dbservice : uses
+playlists --> dbservice : uses
+dbservice --> cosmosdb : connects to
+vimeoservice --> vimeoapi : integrates with
+dbservice --> libdoc : maps to
+dbservice --> playlistdoc : maps to
+config --> program : provides settings
+
+interface "IConfiguration" as iconfig
+interface "ILogger" as ilogger
+
+config - iconfig
+logging - ilogger
+dbservice --> iconfig : uses
+vimeoservice --> iconfig : uses
+libview --> ilogger : uses
+
+@enduml

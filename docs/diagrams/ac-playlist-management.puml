@@ -1,0 +1,50 @@
+@startuml ac-playlist-management
+
+
+title Playlist Management Activity
+
+start
+
+:User accesses Playlists section;
+:Retrieve Playlists from Cosmos DB;
+
+fork
+  :Process playlist data;
+fork again
+  :Validate user permissions;
+end fork
+
+if (Playlists found?) then (yes)
+  :Display available playlists;
+  :User selects playlist;
+  
+  fork
+    :Load tracks for playlist;
+  fork again
+    :Process track metadata;
+  end fork
+  
+  :Process track URLs;
+  
+  if (Tracks have Vimeo source?) then (yes)
+    :Construct Vimeo player URLs;
+  else (no)
+    :Use original URLs;
+  endif
+  
+  :Display tracks to user;
+  :User selects track;
+  :Load and display track content;
+else (no)
+  :Display "No playlists available";
+endif
+
+stop
+
+note right
+  Playlist management includes
+  parallel processing of data
+  and URL construction
+end note
+
+@enduml
