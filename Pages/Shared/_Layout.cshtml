@@ -16,8 +16,7 @@
     <link rel="stylesheet" href="~/css/site.css" asp-append-version="true" />
     <link rel="stylesheet" href="~/AikidoLive.styles.css" asp-append-version="true" />
 </head>
-<body>
-    <!-- Modern Header -->
+<body>    <!-- Modern Header -->
     <header class="modern-header">
         <div class="container">
             <div class="header-content">
@@ -26,7 +25,14 @@
                     <span>Aikido Library</span>
                 </a>
                 
-                <nav>
+                <!-- Mobile Menu Button -->
+                <button class="mobile-menu-toggle" aria-label="Toggle navigation menu" aria-expanded="false">
+                    <span class="hamburger-line"></span>
+                    <span class="hamburger-line"></span>
+                    <span class="hamburger-line"></span>
+                </button>
+                
+                <nav class="nav-container">
                     <ul class="nav-modern">
                         <li><a href="/" title="Home">Home</a></li>
                         <li><a href="/library-titles" title="Library">Library</a></li>
