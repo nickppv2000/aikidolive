@@ -4,60 +4,107 @@
     ViewData["Title"] = "Playlists";
 }
 
-<h1>@ViewData["Title"]</h1>
+<div class="hero-section" style="padding: 2rem 0;">
+    <h1 class="hero-title fade-in-up">🎵 Training Playlists</h1>
+    <p class="hero-subtitle fade-in-up-delay">Curated collections of Aikido training content for focused learning</p>
+</div>
 
 @if (null != Model._playlistsDocuments)
 {
-    var settings = new Newtonsoft.Json.JsonSerializerSettings { Formatting = Newtonsoft.Json.Formatting.None };
-    <select id="PlaylistsContents" onchange="handleSelectionChange(this)">
-    @foreach (var docs in Model._playlistsDocuments)
-    {
-        @foreach (var content in docs.PlaylistsContents)
-        {
-            <option value="@content.PlaylistName" data-tracks="@Newtonsoft.Json.JsonConvert.SerializeObject(content.Tracks, settings)">@content.PlaylistName</option>
-        }
-    }
-    </select>
+    <div class="card fade-in-up">
+        <h3 class="card-title">Select a Playlist</h3>
+        <div class="card-content">
+            <select id="PlaylistsContents" class="playlist-selector" onchange="handleSelectionChange(this)">
+                <option value="">Choose a training playlist...</option>
+                @{
+                    var settings = new Newtonsoft.Json.JsonSerializerSettings { Formatting = Newtonsoft.Json.Formatting.None };
+                }
+                @foreach (var docs in Model._playlistsDocuments)
+                {
+                    @foreach (var content in docs.PlaylistsContents)
+                    {
+                        <option value="@content.PlaylistName" data-tracks="@Newtonsoft.Json.JsonConvert.SerializeObject(content.Tracks, settings)">@content.PlaylistName</option>
+                    }
+                }
+            </select>
+        </div>
+    </div>
     
+    <div class="card fade-in-up" id="playlistContainer" style="display: none;">
+        <h3 class="card-title" id="playlistTitle">Playlist Tracks</h3>
+        <div class="card-content">
+            <ul id="trackList" class="track-list"></ul>
+        </div>
+    </div>
 }
-
-<div id="trackList"></div>
+else
+{
+    <div class="card">
+        <div class="card-content" style="text-align: center;">
+            <h3>🎵 No Playlists Available</h3>
+            <p>Training playlists are currently being organized. Please check back soon for new content.</p>
+            <a href="/" class="btn btn-primary">Return to Home</a>
+        </div>
+    </div>
+}
 
 
 <script>
-    function handleSelectionChange(selectElement) 
-    {
+    function handleSelectionChange(selectElement) {
         var selectedValue = selectElement.value;
+        var playlistContainer = document.getElementById('playlistContainer');
+        var playlistTitle = document.getElementById('playlistTitle');
+        var trackList = document.getElementById('trackList');
+        
+        if (!selectedValue) {
+            playlistContainer.style.display = 'none';
+            return;
+        }
+        
         var selectedOption = selectElement.options[selectElement.selectedIndex];
         var tracks;
-        console.log(selectedOption.dataset.tracks);
+        
         try {
             tracks = JSON.parse(selectedOption.dataset.tracks);
         } catch (error) {
             console.error('Error parsing data-tracks:', error);
             return;
         }
-        var trackList = document.getElementById('trackList');
+        
+        // Update playlist title
+        playlistTitle.textContent = `🎵 ${selectedValue}`;
+        
+        // Clear existing tracks
         trackList.innerHTML = '';
         
-        var ul = document.createElement('ul');
-        ul.style.listStyleType = 'disc';
-
-        tracks.forEach(track => {
+        // Add tracks with modern styling
+        tracks.forEach((track, index) => {
             var li = document.createElement('li');
+            li.className = 'track-item';
+            li.style.animationDelay = `${index * 0.1}s`;
+            
             var a = document.createElement('a');
             a.href = track.Url;
+            a.className = 'track-link';
             a.textContent = track.Name;
+            a.target = '_blank';
+            
             li.appendChild(a);
-            ul.appendChild(li);
+            trackList.appendChild(li);
         });
-
-        trackList.appendChild(ul);
+        
+        // Show the playlist container with animation
+        playlistContainer.style.display = 'block';
+        playlistContainer.classList.add('fade-in-up');
     }
 
-    // Call handleSelectionChange when the page loads
-    window.onload = function() {
+    // Initialize on page load
+    document.addEventListener('DOMContentLoaded', function() {
         var selectElement = document.getElementById('PlaylistsContents');
-        handleSelectionChange(selectElement);
-    }
+        if (selectElement && selectElement.options.length > 1) {
+            // Auto-select first real option if available
+            selectElement.selectedIndex = 1;
+            handleSelectionChange(selectElement);
+        }
+    });
 </script>

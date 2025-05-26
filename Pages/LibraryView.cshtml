@@ -4,23 +4,45 @@
     ViewData["Title"] = "Library View";
 }
 
-<h1>@ViewData["Title"]</h1>
+<div class="hero-section" style="padding: 2rem 0;">
+    <h1 class="hero-title fade-in-up">📚 Aikido Library Collection</h1>
+    <p class="hero-subtitle fade-in-up-delay">Explore our comprehensive collection of Aikido knowledge and training materials</p>
+</div>
 
-<ul>
-    @if (null != Model._libDocuments)
-    {
+@if (null != Model._libDocuments)
+{
+    <div class="library-grid">
         @foreach (var docs in Model._libDocuments)
         {
             @foreach (var content in docs.LibraryContents)
             {
-                <li>@content.LibraryName</li>
-                @foreach (var chapter in content.Chapters)
-                {
-                    <ul>
-                        <li><a href=@chapter.Url>@chapter.Name: @chapter.Description</a></li>
-                    </ul>
-                }
+                <div class="library-item fade-in-up">
+                    <h3 class="library-title">@content.LibraryName</h3>
+                    @if (content.Chapters != null && content.Chapters.Any())
+                    {
+                        <ul class="chapter-list">
+                            @foreach (var chapter in content.Chapters)
+                            {
+                                <li class="chapter-item">
+                                    <a href="@chapter.Url" class="chapter-link">
+                                        <strong>@chapter.Name:</strong> @chapter.Description
+                                    </a>
+                                </li>
+                            }
+                        </ul>
+                    }
+                </div>
             }
         }
-    }
-</ul>
+    </div>
+}
+else
+{
+    <div class="card">
+        <div class="card-content" style="text-align: center;">
+            <h3>🔍 No Library Content Available</h3>
+            <p>The library collection is currently being updated. Please check back soon for new content.</p>
+            <a href="/" class="btn btn-primary">Return to Home</a>
+        </div>
+    </div>
+}

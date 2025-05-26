@@ -4,81 +4,100 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>@ViewData["Title"] - Aikido Library</title>
-    <meta name="viewport" content="width=device-width, initial-scale=1">
+    
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Playfair+Display:wght@400;600;700&display=swap" rel="stylesheet">
+    
+    <!-- Stylesheets -->
     <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.min.css" />
+    <link rel="stylesheet" href="~/css/modern-styles.css" asp-append-version="true" />
     <link rel="stylesheet" href="~/css/site.css" asp-append-version="true" />
     <link rel="stylesheet" href="~/AikidoLive.styles.css" asp-append-version="true" />
-<!--    <script>var __adobewebfontsappname__="dreamweaver"</script>
-    <script src="http://use.edgefonts.net/montserrat:n4:default;source-sans-pro:n2:default.js" type="text/javascript"></script>
--->
 </head>
 <body>
-    <div id="mainWrapper">
-    
-        <header>
-        <!-- Header content goes here -->
-            
-            <a  href="/"><div id="logo"> 
-                <!-- <img src="/img/logo.png" alt="sample logo">
-            <!-- Company Logo text --> 
-            K</div></a>
-            <div id="headerLinks"><a href="#" title="Login">Login</a></div>
-            
-        </header>
-        <section id="offer"> 
-                <h3 align="center">Interactive Aikido Library</h3>
-        </section>
-        <div id="content">
-            <section class="sidebar"> 
-                <!-- This adds a sidebar with 1 searchbox,2 menusets, each with 4 links -->
-                <input type="text"  id="search" value="search">
-                <div id="menubar">
-                    <nav class="menu">
-                    <h2><!-- Title for menuset 1 -->MENU </h2>
-                    <hr>
-                    <ul>
-                        <!-- List of links under menuset 1 -->
-                        <li><a href="/library-titles" title="Link">Library</a></li>
-                        <li><a href="/LibraryView" title="Link">Library view</a></li>
-                        <li><a href="/Blog" title="Link">Blog</a></li> 
-                        <!--<li class="notimp"> notimp class is applied to remove this link from the tablet and phone views 
-                        <a href="#"  title="Link">Link 4</a></li>-->
+    <!-- Modern Header -->
+    <header class="modern-header">
+        <div class="container">
+            <div class="header-content">
+                <a href="/" class="logo-modern">
+                    <div class="logo-icon">合</div>
+                    <span>Aikido Library</span>
+                </a>
+                
+                <nav>
+                    <ul class="nav-modern">
+                        <li><a href="/" title="Home">Home</a></li>
+                        <li><a href="/library-titles" title="Library">Library</a></li>
+                        <li><a href="/LibraryView" title="Library View">Browse</a></li>
+                        <li><a href="/Playlists" title="Playlists">Playlists</a></li>
+                        <li><a href="/Blog" title="Blog">Blog</a></li>
+                        <li><a href="#" title="Login" class="btn btn-secondary">Login</a></li>
                     </ul>
-                    </nav>
-                    
-                    <nav class="menu">
-                    <h2>Aikido Sarasota</h2>
-                    <hr>
-                    <ul>                        
-                        <li><a href="/Playlists" title="Link">Playlists</a></li>
-                        <!--<li><a href="#" title="Link">Link 2</a></li>
-                        <li><a href="#" title="Link">Link 3</a></li>
-                        <li class="notimp">  notimp class is applied to remove this link from the tablet and phone views 
-                        <a href="#" title="Link">Link 4</a></li>
-                        -->
-                    </ul>
-                    </nav>
-                    
-                </div>
-            </section>
-            
-            <main>
+                </nav>
+            </div>
+        </div>
+    </header>
+
+    <!-- Main Content Container -->
+    <div class="container">
+        <div class="main-layout">
+            <!-- Main Content Area -->
+            <main class="content-area">
                 @RenderBody()
             </main>
-           
+            
+            <!-- Modern Sidebar -->
+            <aside class="sidebar-modern">
+                <input type="text" class="search-modern" placeholder="Search Aikido content..." id="search">
+                
+                <div class="menu-section">
+                    <h3 class="menu-title">Navigation</h3>
+                    <ul class="menu-list">
+                        <li class="menu-item">
+                            <a href="/library-titles" class="menu-link" title="Browse Library">📚 Library</a>
+                        </li>
+                        <li class="menu-item">
+                            <a href="/LibraryView" class="menu-link" title="Detailed View">👁️ Library View</a>
+                        </li>
+                        <li class="menu-item">
+                            <a href="/Blog" class="menu-link" title="Read Blog">✍️ Blog</a>
+                        </li>
+                    </ul>
+                </div>
+                
+                <div class="menu-section">
+                    <h3 class="menu-title">Aikido Sarasota</h3>
+                    <ul class="menu-list">
+                        <li class="menu-item">
+                            <a href="/Playlists" class="menu-link" title="Training Playlists">🎵 Playlists</a>
+                        </li>
+                        <li class="menu-item">
+                            <a href="#" class="menu-link" title="About Us">ℹ️ About</a>
+                        </li>
+                        <li class="menu-item">
+                            <a href="#" class="menu-link" title="Contact">📧 Contact</a>
+                        </li>
+                    </ul>
+                </div>
+            </aside>
         </div>
-
-        <footer>
-            <div class="footerlinks">
-                &copy; 2023 - Aikido Library
-            </div>
-            <div> &nbsp; </div>
-            <div> &nbsp; </div>
-        </footer>
     </div>
 
+    <!-- Modern Footer -->
+    <footer class="footer-modern">
+        <div class="container">
+            <div class="footer-content">
+                <p>&copy; 2024 - Aikido Library. Preserving the art and spirit of Aikido for future generations.</p>
+            </div>
+        </div>
+    </footer>
+
+    <!-- Scripts -->
     <script src="~/lib/jquery/dist/jquery.min.js"></script>
     <script src="~/lib/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="~/js/modern-interactions.js" asp-append-version="true"></script>
     <script src="~/js/site.js" asp-append-version="true"></script>
 
     @await RenderSectionAsync("Scripts", required: false)
