@@ -13,7 +13,7 @@ namespace AikidoLive.DataModels
         public string Role {get; set; }
         public string Password { get; set; }
 
-        User()
+        public User()
         {
             FirstName = "";
             LastName = "";
@@ -21,7 +21,7 @@ namespace AikidoLive.DataModels
             Role = "";
             Password = "";
         }
-        User(string firstName, string lastName, string email, string role, string password)
+        public User(string firstName, string lastName, string email, string role, string password)
         {
             FirstName = firstName;
             LastName = lastName;

@@ -1,6 +1,7 @@
 using Microsoft.Azure.Cosmos;
 using AikidoLive;
 using AikidoLive.Services.DBConnector;
+using AikidoLive.Services;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -8,6 +9,7 @@ var builder = WebApplication.CreateBuilder(args);
 builder.Services.AddRazorPages();
 
 builder.Services.AddScoped<DBServiceConnector>();
+builder.Services.AddScoped<IAuthService, AuthService>();
 builder.Services.AddSingleton(x => 
 {
     var cosmosDbConfig = builder.Configuration.GetSection("CosmosDb");
