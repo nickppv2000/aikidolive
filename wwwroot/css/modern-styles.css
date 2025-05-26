@@ -612,34 +612,73 @@ a:hover {
   .main-layout {
     grid-template-columns: 1fr;
     gap: var(--spacing-lg);
+    padding: var(--spacing-lg) 0; /* Reduced from --spacing-xxl */
   }
   
   .sidebar-modern {
     order: -1;
     position: static;
+    padding: var(--spacing-md); /* Reduced padding */
+  }
+  
+  .content-area {
+    padding: var(--spacing-md); /* Reduced padding */
+  }
+  
+  /* Compact header for mobile */
+  .header-content {
+    padding: var(--spacing-sm) 0; /* Reduced from --spacing-md */
+    flex-direction: column;
+    gap: var(--spacing-sm); /* Reduced gap */
+  }
+  
+  .logo-modern {
+    font-size: 1.25rem; /* Smaller logo */
+  }
+  
+  .logo-icon {
+    width: 32px; /* Smaller icon */
+    height: 32px;
+    font-size: 1rem;
+  }
+  
+  /* Compact hero section for mobile */
+  .hero-section {
+    padding: var(--spacing-lg) 0; /* Significantly reduced from --spacing-xxl */
   }
   
   .hero-title {
-    font-size: 2rem;
+    font-size: 1.75rem; /* Smaller hero title */
+    margin-bottom: var(--spacing-sm); /* Reduced margin */
   }
   
-  .nav-modern {
+  .hero-subtitle {
+    font-size: 1rem; /* Smaller subtitle */
+    margin-bottom: var(--spacing-md); /* Reduced margin */
+  }
+    .nav-modern {
     flex-direction: column;
-    gap: var(--spacing-sm);
+    gap: var(--spacing-xs); /* Tighter navigation spacing */
+    width: 100%; /* Full width on mobile */
   }
   
-  .header-content {
-    flex-direction: column;
-    gap: var(--spacing-md);
+  .nav-modern a {
+    padding: var(--spacing-xs) var(--spacing-sm); /* Smaller nav buttons */
+    font-size: 0.9rem;
+    text-align: center; /* Center align mobile nav */
+    border-radius: var(--radius-sm);
   }
   
   .library-grid {
     grid-template-columns: 1fr;
+    gap: var(--spacing-md); /* Reduced grid gap */
   }
   
-  h1 { font-size: 2rem; }
-  h2 { font-size: 1.75rem; }
-  h3 { font-size: 1.5rem; }
+  /* Compact typography */
+  h1 { font-size: 1.75rem; }
+  h2 { font-size: 1.5rem; }
+  h3 { font-size: 1.25rem; }
+  h4 { font-size: 1.1rem; }
 }
 
 @media (max-width: 480px) {
@@ -647,17 +686,91 @@ a:hover {
     padding: 0 var(--spacing-sm);
   }
   
-  .content-area,
-  .sidebar-modern {
-    padding: var(--spacing-md);
+  /* Ultra-compact header for small phones */
+  .header-content {
+    padding: var(--spacing-xs) 0; /* Minimal header padding */
+  }
+  
+  .logo-modern {
+    font-size: 1.1rem; /* Even smaller logo */
+  }
+  
+  .logo-icon {
+    width: 28px; /* Smaller icon */
+    height: 28px;
+    font-size: 0.9rem;
+  }
+  
+  /* Minimal hero section for small screens */
+  .hero-section {
+    padding: var(--spacing-md) 0; /* Minimal hero padding */
   }
   
   .hero-title {
-    font-size: 1.75rem;
+    font-size: 1.5rem; /* Compact hero title */
+    margin-bottom: var(--spacing-xs);
   }
   
   .hero-subtitle {
-    font-size: 1rem;
+    font-size: 0.9rem; /* Smaller subtitle */
+    margin-bottom: var(--spacing-sm);
+  }
+  
+  .content-area,
+  .sidebar-modern {
+    padding: var(--spacing-sm); /* Minimal content padding */
+  }
+  
+  /* Compact navigation */
+  .nav-modern a {
+    padding: var(--spacing-xs); /* Minimal nav padding */
+    font-size: 0.85rem;
+  }
+  
+  /* Tighter typography */
+  h1 { font-size: 1.5rem; }
+  h2 { font-size: 1.25rem; }
+  h3 { font-size: 1.1rem; }
+  h4 { font-size: 1rem; }
+    /* Compact cards and components */
+  .card {
+    padding: var(--spacing-md); /* Reduced card padding */
+    margin-bottom: var(--spacing-md); /* Reduced card spacing */
+  }
+  
+  .playlist-tile {
+    padding: var(--spacing-sm); /* Compact playlist tiles */
+  }
+  
+  /* Mobile-specific utility classes */
+  .mobile-compact {
+    padding: var(--spacing-xs) !important;
+    margin: var(--spacing-xs) 0 !important;
+  }
+}
+
+/* Extra small screens (portrait phones) */
+@media (max-width: 360px) {
+  .hero-section {
+    padding: var(--spacing-sm) 0; /* Minimal padding for very small screens */
+  }
+  
+  .hero-title {
+    font-size: 1.25rem;
+    margin-bottom: 0;
+  }
+  
+  .hero-subtitle {
+    font-size: 0.8rem;
+    margin-bottom: var(--spacing-xs);
+  }
+  
+  .header-content {
+    padding: var(--spacing-xs) 0;
+  }
+  
+  .main-layout {
+    padding: var(--spacing-sm) 0;
   }
 }
 
