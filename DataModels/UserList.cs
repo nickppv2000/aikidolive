@@ -7,18 +7,18 @@ namespace AikidoLive.DataModels
 {
     public class UserList
     {
-        public string Id { get; set; }
+        public string id { get; set; }
         public List<User> Users { get; set; }
 
-        UserList()
+        public UserList()
         {
-            Id = "";
+            id = "";
             Users = new List<User>();
         }
 
-        UserList(string id, List<User> users)
+        public UserList(string id, List<User> users)
         {
-            Id = id;
+            this.id = id;
             Users = users;
         }
     }

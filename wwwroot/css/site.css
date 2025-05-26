@@ -1,5 +1,55 @@
 @charset "utf-8";
 /* Global Styles */
+
+/* Authentication pages styles */
+.auth-container {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    min-height: 70vh;
+    padding: 20px;
+}
+
+.auth-box {
+    background-color: #f8f9fa;
+    border-radius: 8px;
+    box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+    padding: 30px;
+    width: 100%;
+    max-width: 450px;
+}
+
+.auth-box h1 {
+    font-size: 24px;
+    margin-bottom: 20px;
+    text-align: center;
+    color: #343a40;
+}
+
+.auth-box .form-group {
+    margin-bottom: 20px;
+}
+
+.auth-box .form-check {
+    margin-top: 15px;
+}
+
+.auth-box .btn-block {
+    margin-top: 20px;
+    width: 100%;
+}
+
+.auth-links {
+    margin-top: 20px;
+    text-align: center;
+}
+
+.user-greeting {
+    padding: 8px;
+    color: #495057;
+    font-weight: 500;
+}
+
 a:hover {
 	color: rgba(255,255,255,1.00);
 }

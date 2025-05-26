@@ -39,7 +39,16 @@
                         <li><a href="/LibraryView" title="Library View">Browse</a></li>
                         <li><a href="/Playlists" title="Playlists">Playlists</a></li>
                         <li><a href="/Blog" title="Blog">Blog</a></li>
-                        <li><a href="#" title="Login" class="btn btn-secondary">Login</a></li>
+                        @if (User?.Identity?.IsAuthenticated == true)
+                        {
+                            <li><span class="user-greeting">Hello, @User.Identity.Name!</span></li>
+                            <li><a href="/Account/Logout" title="Logout" class="btn btn-secondary">Logout</a></li>
+                        }
+                        else
+                        {
+                            <li><a href="/Account/Login" title="Login" class="btn btn-secondary">Login</a></li>
+                            <li><a href="/Account/Register" title="Register" class="btn btn-primary">Register</a></li>
+                        }
                     </ul>
                 </nav>
             </div>

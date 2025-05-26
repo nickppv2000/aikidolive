@@ -21,6 +21,7 @@ namespace AikidoLive.DataModels
             Role = "";
             Password = "";
         }
+
         public User(string firstName, string lastName, string email, string role, string password)
         {
             FirstName = firstName;

@@ -4,33 +4,50 @@
     ViewData["Title"] = "Register";
 }
 
-<div class="container">
-    <div class="row justify-content-center">
-        <div class="col-md-6">
-            <h1>@ViewData["Title"]</h1>
-            <form method="post">
-                <div class="form-group">
-                    <label asp-for="Input.FirstName"></label>
-                    <input asp-for="Input.FirstName" class="form-control" />
-                    <span asp-validation-for="Input.FirstName" class="text-danger"></span>
-                </div>
-                <div class="form-group">
-                    <label asp-for="Input.LastName"></label>
-                    <input asp-for="Input.LastName" class="form-control" />
-                    <span asp-validation-for="Input.LastName" class="text-danger"></span>
-                </div>
-                <div class="form-group">
-                    <label asp-for="Input.Email"></label>
-                    <input asp-for="Input.Email" class="form-control" />
-                    <span asp-validation-for="Input.Email" class="text-danger"></span>
-                </div>
-                <div class="form-group">
-                    <label asp-for="Input.Password"></label>
-                    <input asp-for="Input.Password" class="form-control" />
-                    <span asp-validation-for="Input.Password" class="text-danger"></span>
-                </div>
-                <button type="submit" class="btn btn-primary mt-3">Register</button>
-            </form>
+
+<div class="auth-container">
+    <div class="auth-box">
+        <h1>Register</h1>
+
+        @if (!string.IsNullOrEmpty(Model.ErrorMessage))
+        {
+            <div class="alert alert-danger" role="alert">
+                @Model.ErrorMessage
+            </div>
+        }
+
+        <form method="post">
+            <div class="form-group">
+                <label asp-for="RegisterInput.FirstName">First Name</label>
+                <input asp-for="RegisterInput.FirstName" class="form-control" />
+                <span asp-validation-for="RegisterInput.FirstName" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="RegisterInput.LastName">Last Name</label>
+                <input asp-for="RegisterInput.LastName" class="form-control" />
+                <span asp-validation-for="RegisterInput.LastName" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="RegisterInput.Email">Email</label>
+                <input asp-for="RegisterInput.Email" class="form-control" />
+                <span asp-validation-for="RegisterInput.Email" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="RegisterInput.Password">Password</label>
+                <input asp-for="RegisterInput.Password" class="form-control" type="password" />
+                <span asp-validation-for="RegisterInput.Password" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="RegisterInput.ConfirmPassword">Confirm Password</label>
+                <input asp-for="RegisterInput.ConfirmPassword" class="form-control" type="password" />
+                <span asp-validation-for="RegisterInput.ConfirmPassword" class="text-danger"></span>
+            </div>
+            <button type="submit" class="btn btn-primary btn-block">Register</button>
+        </form>
+
+        <div class="auth-links">
+            <p>Already have an account? <a asp-page="/Account/Login">Login</a></p>
+
         </div>
     </div>
 </div>
