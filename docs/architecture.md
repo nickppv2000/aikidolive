@@ -198,7 +198,7 @@ The Aikido Live system follows a layered architecture pattern with clear separat
 | Layer | Technology | Purpose |
 |-------|------------|---------|
 | Frontend | Razor Pages, jQuery, Bootstrap | User interface |
-| Backend | ASP.NET Core 7.0 | Web application framework |
+| Backend | ASP.NET Core 8.0 | Web application framework |
 | Database | Azure Cosmos DB | Document storage |
 | External API | Vimeo API | Video content |
 | Hosting | Azure App Service | Cloud hosting |

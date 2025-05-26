@@ -6,10 +6,10 @@ This document provides a comprehensive overview of the Aikido Live Interactive L
 
 ## Project Structure
 
-The Aikido Live system is an ASP.NET Core 7.0 web application that provides an interactive digital library for Aikido practitioners. The system integrates with Azure Cosmos DB for data persistence and Vimeo API for video content management.
+The Aikido Live system is an ASP.NET Core 8.0 web application that provides an interactive digital library for Aikido practitioners. The system integrates with Azure Cosmos DB for data persistence and Vimeo API for video content management.
 
 ### Key Technologies
-- **Backend**: ASP.NET Core 7.0, C#
+- **Backend**: ASP.NET Core 8.0, C#
 - **Database**: Azure Cosmos DB (NoSQL)
 - **Video Platform**: Vimeo API
 - **Frontend**: Razor Pages, Bootstrap, jQuery
@@ -207,6 +207,6 @@ The modular documentation approach ensures maintainability and allows for increm
 
 **Documentation Generated**: May 25, 2025  
 **System Version**: Aikido Live v1.0  
-**Framework**: ASP.NET Core 7.0  
+**Framework**: ASP.NET Core 8.0  
 **Database**: Azure Cosmos DB  
 **External APIs**: Vimeo API v3.4
