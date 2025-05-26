@@ -1,3 +1,4 @@
+
 using AikidoLive.DataModels;
 using AikidoLive.Services.Authentication;
 using Microsoft.AspNetCore.Mvc;
@@ -5,6 +6,7 @@ using Microsoft.AspNetCore.Mvc.RazorPages;
 using Microsoft.Extensions.Logging;
 using System.ComponentModel.DataAnnotations;
 using System.Threading.Tasks;
+
 
 namespace AikidoLive.Pages.Account
 {
@@ -14,9 +16,11 @@ namespace AikidoLive.Pages.Account
         private readonly ILogger<RegisterModel> _logger;
 
         [BindProperty]
+
         public RegisterInputModel RegisterInput { get; set; } = new RegisterInputModel();
 
         public string ErrorMessage { get; set; }
+
 
         public RegisterModel(IAuthService authService, ILogger<RegisterModel> logger)
         {
@@ -30,6 +34,7 @@ namespace AikidoLive.Pages.Account
 
         public async Task<IActionResult> OnPostAsync()
         {
+
             if (!ModelState.IsValid)
             {
                 return Page();
@@ -73,6 +78,7 @@ namespace AikidoLive.Pages.Account
             [DataType(DataType.Password)]
             [Compare("Password", ErrorMessage = "The password and confirmation password do not match.")]
             public string ConfirmPassword { get; set; }
+
         }
     }
 }

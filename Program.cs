@@ -1,6 +1,7 @@
 using Microsoft.Azure.Cosmos;
 using AikidoLive;
 using AikidoLive.Services.DBConnector;
+
 using AikidoLive.Services.Authentication;
 using Microsoft.AspNetCore.Authentication.Cookies;
 using System;
@@ -8,6 +9,7 @@ using System;
 var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
+
 builder.Services.AddRazorPages(options =>
 {
     // Require authentication for Library and Playlists pages
@@ -32,12 +34,14 @@ builder.Services.AddAuthorization();
 
 // Add DBServiceConnector
 builder.Services.AddScoped<DBServiceConnector>();
+
 builder.Services.AddSingleton(x => 
 {
     var cosmosDbConfig = builder.Configuration.GetSection("CosmosDb");
     var account = cosmosDbConfig["Account"];
     var key = cosmosDbConfig["Key"];
     return new CosmosClient(account, key);
+
 });
 
 // Add Authentication Services
@@ -66,5 +70,6 @@ app.UseAuthentication();
 app.UseAuthorization();
 
 app.MapRazorPages();
+
 
 app.Run();
