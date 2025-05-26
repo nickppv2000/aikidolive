@@ -23,7 +23,7 @@ The system follows a layered architecture pattern with clear separation of conce
 
 ## Technology Stack
 
-- **Framework**: ASP.NET Core 7.0
+- **Framework**: ASP.NET Core 8.0
 - **Database**: Azure Cosmos DB
 - **Video Platform**: Vimeo API
 - **Frontend**: Razor Pages, Bootstrap, jQuery
@@ -54,7 +54,7 @@ All system diagrams are created using PlantUML with SysML notation and are avail
 
 ## System Requirements
 
-- .NET 7.0 or higher
+- .NET 8.0 or higher
 - Azure Cosmos DB account
 - Vimeo API access
 - Modern web browser
