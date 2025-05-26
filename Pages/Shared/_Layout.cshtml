@@ -14,6 +14,7 @@
     <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.min.css" />
     <link rel="stylesheet" href="~/css/modern-styles.css" asp-append-version="true" />
     <link rel="stylesheet" href="~/css/site.css" asp-append-version="true" />
+    <link rel="stylesheet" href="~/css/auth.css" asp-append-version="true" />
     <link rel="stylesheet" href="~/AikidoLive.styles.css" asp-append-version="true" />
 </head>
 <body>    <!-- Modern Header -->
@@ -35,11 +36,19 @@
                 <nav class="nav-container">
                     <ul class="nav-modern">
                         <li><a href="/" title="Home">Home</a></li>
-                        <li><a href="/library-titles" title="Library">Library</a></li>
-                        <li><a href="/LibraryView" title="Library View">Browse</a></li>
-                        <li><a href="/Playlists" title="Playlists">Playlists</a></li>
                         <li><a href="/Blog" title="Blog">Blog</a></li>
-                        <li><a href="#" title="Login" class="btn btn-secondary">Login</a></li>
+                        @if (User.Identity.IsAuthenticated)
+                        {
+                            <li><a href="/library-titles" title="Library">Library</a></li>
+                            <li><a href="/LibraryView" title="Library View">Browse</a></li>
+                            <li><a href="/Playlists" title="Playlists">Playlists</a></li>
+                            <li><a href="/Account/Logout" title="Logout" class="btn btn-secondary">Logout</a></li>
+                        }
+                        else
+                        {
+                            <li><a href="/Account/Login" title="Login" class="btn btn-primary">Login</a></li>
+                            <li><a href="/Account/Register" title="Register" class="btn btn-outline-primary">Register</a></li>
+                        }
                     </ul>
                 </nav>
             </div>
@@ -61,12 +70,15 @@
                 <div class="menu-section">
                     <h3 class="menu-title">Navigation</h3>
                     <ul class="menu-list">
-                        <li class="menu-item">
-                            <a href="/library-titles" class="menu-link" title="Browse Library">📚 Library</a>
-                        </li>
-                        <li class="menu-item">
-                            <a href="/LibraryView" class="menu-link" title="Detailed View">👁️ Library View</a>
-                        </li>
+                        @if (User.Identity.IsAuthenticated)
+                        {
+                            <li class="menu-item">
+                                <a href="/library-titles" class="menu-link" title="Browse Library">📚 Library</a>
+                            </li>
+                            <li class="menu-item">
+                                <a href="/LibraryView" class="menu-link" title="Detailed View">👁️ Library View</a>
+                            </li>
+                        }
                         <li class="menu-item">
                             <a href="/Blog" class="menu-link" title="Read Blog">✍️ Blog</a>
                         </li>
@@ -76,9 +88,12 @@
                 <div class="menu-section">
                     <h3 class="menu-title">Aikido Sarasota</h3>
                     <ul class="menu-list">
-                        <li class="menu-item">
-                            <a href="/Playlists" class="menu-link" title="Training Playlists">🎵 Playlists</a>
-                        </li>
+                        @if (User.Identity.IsAuthenticated)
+                        {
+                            <li class="menu-item">
+                                <a href="/Playlists" class="menu-link" title="Training Playlists">🎵 Playlists</a>
+                            </li>
+                        }
                         <li class="menu-item">
                             <a href="#" class="menu-link" title="About Us">ℹ️ About</a>
                         </li>
@@ -87,6 +102,19 @@
                         </li>
                     </ul>
                 </div>
+                
+                @if (User.Identity.IsAuthenticated)
+                {
+                    <div class="menu-section">
+                        <h3 class="menu-title">User</h3>
+                        <p>Welcome, @User.Identity.Name!</p>
+                        <ul class="menu-list">
+                            <li class="menu-item">
+                                <a href="/Account/Logout" class="menu-link" title="Logout">🚪 Logout</a>
+                            </li>
+                        </ul>
+                    </div>
+                }
             </aside>
         </div>
     </div>

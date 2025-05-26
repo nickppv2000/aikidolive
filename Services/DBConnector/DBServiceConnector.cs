@@ -118,7 +118,17 @@ namespace AikidoLive.Services.DBConnector
             return playlistsDocuments;
         }
 
+        // Add method to update user list in the database
+        public async Task UpdateUser(UserList userList)
+        {
+            string databaseName = _databasesDictionary.Keys.First();
+            string containerName = _databasesDictionary.Values.First().First();
+            
+            _container = _client.GetContainer(databaseName, containerName);
 
+            // Update the document
+            await _container.UpsertItemAsync(userList, new PartitionKey(userList.Id));
+        }
 
         public async Task<List<string>> GetDatabasesListAsync()
         {
