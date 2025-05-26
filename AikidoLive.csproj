@@ -12,4 +12,12 @@
     <PackageReference Include="Microsoft.Azure.Cosmos" Version="3.37.0" />
   </ItemGroup>
 
+  <!-- Exclude the test project files from compilation -->
+  <ItemGroup>
+    <Compile Remove="AikidoLive.Tests\**" />
+    <Content Remove="AikidoLive.Tests\**" />
+    <EmbeddedResource Remove="AikidoLive.Tests\**" />
+    <None Remove="AikidoLive.Tests\**" />
+  </ItemGroup>
+
 </Project>
