@@ -23,11 +23,11 @@
   --spacing-lg: 1.5rem;
   --spacing-xl: 2rem;
   --spacing-xxl: 3rem;
-  
-  /* Shadows */
+    /* Shadows */
   --shadow-sm: 0 1px 3px rgba(0, 0, 0, 0.12), 0 1px 2px rgba(0, 0, 0, 0.24);
   --shadow-md: 0 4px 6px rgba(0, 0, 0, 0.1), 0 2px 4px rgba(0, 0, 0, 0.06);
   --shadow-lg: 0 10px 15px rgba(0, 0, 0, 0.1), 0 4px 6px rgba(0, 0, 0, 0.05);
+  --shadow-xl: 0 20px 25px rgba(0, 0, 0, 0.15), 0 10px 10px rgba(0, 0, 0, 0.04);
   
   /* Border Radius */
   --radius-sm: 0.25rem;
@@ -312,6 +312,10 @@ a:hover {
   border-left: 4px solid var(--secondary-color);
 }
 
+.library-item-clickable {
+  cursor: pointer;
+}
+
 .library-item:hover {
   box-shadow: var(--shadow-lg);
   transform: translateY(-3px);
@@ -367,17 +371,46 @@ a:hover {
 
 .track-list {
   list-style: none;
+  padding: 0;
+  margin: 0;
 }
 
 .track-item {
+  margin-bottom: var(--spacing-sm);
+  opacity: 0;
+  animation: fadeInUp 0.4s ease-out forwards;
+}
+
+.modal-body .track-item {
+  padding: 0;
+  background-color: transparent;
+}
+
+.modal-body .track-link {
+  display: block;
+  padding: var(--spacing-md);
+  background-color: var(--light-gray);
+  border-radius: var(--radius-md);
+  color: var(--dark-gray);
+  text-decoration: none;
+  transition: all var(--transition-normal);
+}
+
+.modal-body .track-link:hover {
+  background-color: var(--secondary-color);
+  color: var(--white);
+  transform: translateX(5px);
+}
+
+/* Legacy track styles for other pages */
+.track-item:not(.modal-body .track-item) {
   padding: var(--spacing-md);
   border-radius: var(--radius-md);
-  margin-bottom: var(--spacing-sm);
   background-color: var(--light-gray);
   transition: all var(--transition-normal);
 }
 
-.track-item:hover {
+.track-item:not(.modal-body .track-item):hover {
   background-color: var(--medium-gray);
   transform: translateX(5px);
 }
@@ -391,6 +424,88 @@ a:hover {
 .track-link:hover {
   color: var(--secondary-color);
   text-decoration: none;
+}
+
+.playlist-tile {
+  position: relative;
+  overflow: hidden;
+}
+
+.playlist-tile:hover {
+  cursor: pointer;
+}
+
+.playlist-track-count {
+  color: var(--medium-gray);
+  font-size: 0.9rem;
+  margin-bottom: var(--spacing-sm);
+}
+
+.playlist-preview {
+  margin-top: var(--spacing-sm);
+}
+
+.preview-text {
+  font-style: italic;
+  color: var(--dark-gray);
+  font-size: 0.9rem;
+}
+
+/* Modal */
+.modal {
+  position: fixed;
+  z-index: 1000;
+  left: 0;
+  top: 0;
+  width: 100%;
+  height: 100%;
+  background-color: rgba(0, 0, 0, 0.5);
+  backdrop-filter: blur(5px);
+}
+
+.modal-content {
+  background-color: var(--white);
+  margin: 5% auto;
+  padding: 0;
+  border-radius: var(--radius-lg);
+  width: 90%;
+  max-width: 600px;
+  max-height: 80vh;
+  overflow: hidden;
+  box-shadow: var(--shadow-xl);
+}
+
+.modal-header {
+  background-color: var(--primary-color);
+  color: var(--white);
+  padding: var(--spacing-lg);
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.modal-header h3 {
+  margin: 0;
+  font-size: 1.25rem;
+}
+
+.close {
+  color: var(--white);
+  font-size: 2rem;
+  font-weight: bold;
+  cursor: pointer;
+  line-height: 1;
+  transition: opacity var(--transition-normal);
+}
+
+.close:hover {
+  opacity: 0.7;
+}
+
+.modal-body {
+  padding: var(--spacing-lg);
+  max-height: 60vh;
+  overflow-y: auto;
 }
 
 /* Buttons */

@@ -16,7 +16,8 @@
         {
             @foreach (var content in docs.LibraryContents)
             {
-                <div class="library-item fade-in-up">
+                var firstChapterUrl = content.Chapters?.FirstOrDefault()?.Url ?? "#";
+                <div class="library-item library-item-clickable fade-in-up" onclick="window.open('@firstChapterUrl', '_blank')" data-url="@firstChapterUrl">
                     <h3 class="library-title">@content.LibraryName</h3>
                     @if (content.Chapters != null && content.Chapters.Any())
                     {
@@ -24,7 +25,7 @@
                             @foreach (var chapter in content.Chapters)
                             {
                                 <li class="chapter-item">
-                                    <a href="@chapter.Url" class="chapter-link">
+                                    <a href="@chapter.Url" class="chapter-link" onclick="event.stopPropagation()">
                                         <strong>@chapter.Name:</strong> @chapter.Description
                                     </a>
                                 </li>
