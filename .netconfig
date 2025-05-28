@@ -1,0 +1,7 @@
+[platform]
+name = dotnet
+version = 8.0.0
+
+[project]
+name = AikidoLive.csproj
+framework = net8.0

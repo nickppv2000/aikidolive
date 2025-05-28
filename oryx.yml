@@ -1,2 +1,10 @@
+build:
+  commands:
+    - echo "Building .NET 8.0 application"
+    - dotnet restore AikidoLive.csproj --verbosity normal
+    - dotnet build AikidoLive.csproj --configuration Release --verbosity normal
+    - dotnet publish AikidoLive.csproj --configuration Release --output ./bin/Release/net8.0/publish --verbosity normal
+
 platform: dotnet
 platform-version: "8.0.0"
+project: AikidoLive.csproj
