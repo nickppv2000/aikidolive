@@ -1,0 +1,5 @@
+build:
+  commands:
+    - echo "Building with .NET 8.0"
+platform: dotnet
+platform-version: 8.0
