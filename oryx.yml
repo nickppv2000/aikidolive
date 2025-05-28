@@ -1,8 +1,2 @@
-build:
-  commands:
-    - echo "Building with .NET 8.0"
-    - dotnet restore AikidoLive.csproj
-    - dotnet publish AikidoLive.csproj --configuration Release --output ./bin/publish
 platform: dotnet
-platform-version: 8.0
-project: AikidoLive.csproj
+platform-version: "8.0.0"
