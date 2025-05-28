@@ -1,2 +1,2 @@
 [config]
-project = AikidoLive.csproj
+command = bash deploy.sh
