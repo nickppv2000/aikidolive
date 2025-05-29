@@ -54,9 +54,11 @@ WEBSITES_ENABLE_APP_SERVICE_STORAGE: true
 
 ## 🚀 Deployment Methods
 
-### Method 1: Automated PowerShell Script (Recommended)
+### Method 1: Automated Deployment Scripts (Recommended)
 
-The easiest way to deploy is using the provided PowerShell script:
+The easiest way to deploy is using the provided deployment scripts. Choose based on your platform:
+
+#### Option A: PowerShell Script (Windows/Cross-platform)
 
 ```powershell
 # Navigate to project directory
@@ -75,12 +77,32 @@ cd c:\projects\websites\Aikido\aikidolive
 .\deploy.ps1 -Help
 ```
 
-#### Script Features
+#### Option B: Bash Script (Linux/macOS/WSL)
+
+```bash
+# Navigate to project directory
+cd /path/to/aikidolive
+
+# Standard deployment
+./scripts/deploy.sh
+
+# Skip build (use existing artifacts)
+./scripts/deploy.sh --skip-build
+
+# Deploy without restart
+./scripts/deploy.sh --skip-restart
+
+# Get help
+./scripts/deploy.sh --help
+```
+
+#### Script Features (Both PowerShell and Bash)
 - ✅ Automated build and packaging
 - ✅ Error handling and validation
 - ✅ Colored output with progress indicators
 - ✅ Deployment verification
 - ✅ Optional restart and testing
+- ✅ Cross-platform compatibility
 
 ### Method 2: Manual Deployment
 
@@ -259,6 +281,8 @@ aikidolive/
 ## 🎯 Quick Reference
 
 ### Essential Commands
+
+#### PowerShell
 ```powershell
 # Full automated deployment
 .\deploy.ps1
@@ -274,6 +298,24 @@ az webapp restart --name aikidolibrary --resource-group aikidolibraryrsrcgrp
 
 # Check application
 Invoke-WebRequest -Uri "https://aikidolibrary.azurewebsites.net" -Method Head
+```
+
+#### Bash/Linux
+```bash
+# Full automated deployment
+./scripts/deploy.sh
+
+# Manual build only
+dotnet publish AikidoLive.csproj -c Release -o ./clean-deploy --self-contained false --runtime linux-x64
+
+# Manual deploy only
+az webapp deploy --resource-group aikidolibraryrsrcgrp --name aikidolibrary --src-path "./clean-app-deploy.zip" --type zip
+
+# Restart app service
+az webapp restart --name aikidolibrary --resource-group aikidolibraryrsrcgrp
+
+# Check application
+curl -I "https://aikidolibrary.azurewebsites.net"
 ```
 
 ### URLs and Resources
