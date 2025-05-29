@@ -22,7 +22,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\AikidoLive.csproj" />
+    <ProjectReference Include="..\..\src\AikidoLive\AikidoLive.csproj" />
   </ItemGroup>
 
 </Project>

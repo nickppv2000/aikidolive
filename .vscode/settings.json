@@ -1,0 +1,3 @@
+{
+    "appService.defaultWebAppToDeploy": "/subscriptions/fd3053a1-7403-43bc-a401-e1f61281eaba/resourceGroups/AikidoLibraryRsrcGrp/providers/Microsoft.Web/sites/AikidoLibrary"
+}

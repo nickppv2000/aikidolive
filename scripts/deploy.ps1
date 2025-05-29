@@ -42,7 +42,7 @@ param(
 # Configuration
 $ResourceGroupName = "aikidolibraryrsrcgrp"
 $AppServiceName = "aikidolibrary"
-$ProjectFile = "AikidoLive.csproj"
+$ProjectFile = "src\AikidoLive\AikidoLive.csproj"
 $BuildOutput = "./clean-deploy"
 $DeploymentPackage = "./clean-app-deploy.zip"
 $AppUrl = "https://aikidolibrary.azurewebsites.net"
