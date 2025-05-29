@@ -396,3 +396,24 @@ FodyWeavers.xsd
 
 # JetBrains Rider
 *.sln.iml
+
+# Custom deployment artifacts and build outputs
+clean-deploy/
+*.zip
+app-deploy.zip
+clean-app-deploy.zip
+app.zip
+logs.zip
+
+# Deployment scripts (uncomment if you want to track deployment script)
+# deploy.ps1
+
+# Azure deployment files
+.deployment
+.netconfig
+build.cmd
+deploy.sh
+oryx.yml
+
+# Published output directory
+publish/
