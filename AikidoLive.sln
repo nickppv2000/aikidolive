@@ -2,9 +2,9 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 17
 VisualStudioVersion = 17.0.31903.59
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "AikidoLive", "AikidoLive.csproj", "{FDB273F4-B85A-4A04-B9A6-B0EBB8668369}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "AikidoLive", "src\AikidoLive\AikidoLive.csproj", "{FDB273F4-B85A-4A04-B9A6-B0EBB8668369}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "AikidoLive.Tests", "AikidoLive.Tests\AikidoLive.Tests.csproj", "{1E45AEDB-8165-4765-8243-FB3F855B7127}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "AikidoLive.Tests", "tests\AikidoLive.Tests\AikidoLive.Tests.csproj", "{1E45AEDB-8165-4765-8243-FB3F855B7127}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

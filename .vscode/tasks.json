@@ -1,0 +1,15 @@
+{
+	"version": "2.0.0",
+	"tasks": [
+		{
+			"label": "Build and Test Aikido Application",
+			"type": "shell",
+			"command": "dotnet build src\\AikidoLive\\AikidoLive.csproj && echo 'Build successful!' && dotnet publish src\\AikidoLive\\AikidoLive.csproj -c Release -o ./temp-test-deploy --self-contained false --runtime linux-x64 && echo 'Publish successful!' && Remove-Item -Path ./temp-test-deploy -Recurse -Force && echo 'Cleanup successful!'",
+			"group": "build",
+			"problemMatcher": [
+				"$tsc"
+			],
+			"isBackground": false
+		}
+	]
+}

@@ -412,7 +412,6 @@ logs.zip
 .deployment
 .netconfig
 build.cmd
-deploy.sh
 oryx.yml
 
 # Published output directory
