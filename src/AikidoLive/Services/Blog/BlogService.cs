@@ -22,9 +22,9 @@ namespace AikidoLive.Services.Blog
 
     public class BlogService : IBlogService
     {
-        private readonly DBServiceConnector _dbServiceConnector;
+        private readonly IDBServiceConnector _dbServiceConnector;
 
-        public BlogService(DBServiceConnector dbServiceConnector)
+        public BlogService(IDBServiceConnector dbServiceConnector)
         {
             _dbServiceConnector = dbServiceConnector;
         }

@@ -14,12 +14,12 @@ namespace AikidoLive.Tests.BlogTests
 {
     public class BlogServiceTests
     {
-        private readonly Mock<DBServiceConnector> _mockDbConnector;
+        private readonly Mock<IDBServiceConnector> _mockDbConnector;
         private readonly BlogService _blogService;
 
         public BlogServiceTests()
         {
-            _mockDbConnector = new Mock<DBServiceConnector>(Mock.Of<IConfiguration>(), Mock.Of<CosmosClient>());
+            _mockDbConnector = new Mock<IDBServiceConnector>();
             _blogService = new BlogService(_mockDbConnector.Object);
         }
 

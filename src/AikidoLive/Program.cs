@@ -33,6 +33,7 @@ builder.Services.AddAuthentication(CookieAuthenticationDefaults.AuthenticationSc
 builder.Services.AddAuthorization();
 
 // Add DBServiceConnector
+builder.Services.AddScoped<IDBServiceConnector, DBServiceConnector>();
 builder.Services.AddScoped<DBServiceConnector>();
 
 builder.Services.AddSingleton(x => 

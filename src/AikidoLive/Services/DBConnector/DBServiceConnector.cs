@@ -7,7 +7,7 @@ using AikidoLive.DataModels;
 
 namespace AikidoLive.Services.DBConnector
 {
-    public class DBServiceConnector : IDisposable
+    public class DBServiceConnector : IDBServiceConnector, IDisposable
     {
         private readonly CosmosClient _client;
         private Container? _container;
@@ -36,7 +36,22 @@ namespace AikidoLive.Services.DBConnector
             var blogDbSettings = configuration.GetSection("blogDB");
             _blogDBName = blogDbSettings["document"] ?? "";
 
-            _databases = GetDatabasesListAsync().GetAwaiter().GetResult();
+            Console.WriteLine($"DBServiceConnector initializing with:");
+            Console.WriteLine($"  - Library document: {_libraryDbName}");
+            Console.WriteLine($"  - Users document: {_usersDBName}");
+            Console.WriteLine($"  - Playlists document: {_playlistsDBName}");
+            Console.WriteLine($"  - Blog document: {_blogDBName}");
+
+            try
+            {
+                _databases = GetDatabasesListAsync().GetAwaiter().GetResult();
+                Console.WriteLine($"Database discovery completed successfully. Found {_databases.Count} databases.");
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"Database discovery failed during constructor: {ex.Message}");
+                // Don't throw here - let the methods handle the empty dictionary gracefully
+            }
         }
 
         public void Dispose()
@@ -143,20 +158,42 @@ namespace AikidoLive.Services.DBConnector
 
         public async Task<List<string>> GetDatabasesListAsync()
         {
-            var iterator = _client.GetDatabaseQueryIterator<DatabaseProperties>();
-            var databases = new List<string>();
-
-            while (iterator.HasMoreResults)
+            try
             {
-                foreach (var database in await iterator.ReadNextAsync())
-                {
-                    databases.Add(database.Id);
-                    var containers = GetContainersListAsync(database.Id).Result;
-                    _databasesDictionary.Add(database.Id, containers);
-                }
-            }
+                var iterator = _client.GetDatabaseQueryIterator<DatabaseProperties>();
+                var databases = new List<string>();
 
-            return databases;
+                while (iterator.HasMoreResults)
+                {
+                    foreach (var database in await iterator.ReadNextAsync())
+                    {
+                        databases.Add(database.Id);
+                        var containers = await GetContainersListAsync(database.Id);
+                        _databasesDictionary.Add(database.Id, containers);
+                    }
+                }
+
+                Console.WriteLine($"Database discovery found {databases.Count} databases:");
+                foreach (var db in databases)
+                {
+                    Console.WriteLine($"  - Database: {db}");
+                    if (_databasesDictionary.ContainsKey(db))
+                    {
+                        foreach (var container in _databasesDictionary[db])
+                        {
+                            Console.WriteLine($"    - Container: {container}");
+                        }
+                    }
+                }
+
+                return databases;
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"Database discovery failed: {ex.Message}");
+                Console.WriteLine($"Stack trace: {ex.StackTrace}");
+                throw new Exception($"Failed to discover databases: {ex.Message}", ex);
+            }
         }
         public async Task<List<string>> GetContainersListAsync(string databaseName)
         {
@@ -180,6 +217,12 @@ namespace AikidoLive.Services.DBConnector
         {
             try
             {
+                // Check if database discovery was successful
+                if (_databasesDictionary == null || !_databasesDictionary.Any())
+                {
+                    throw new InvalidOperationException("Database discovery failed. No databases found in _databasesDictionary.");
+                }
+
                 string databaseName = _databasesDictionary.Keys.First();
                 string containerName = _databasesDictionary.Values.First().First();
 
@@ -201,10 +244,28 @@ namespace AikidoLive.Services.DBConnector
             }
             catch (Exception ex)
             {
-                // If no blog document exists, create one
-                var newBlogDocument = new BlogDocument();
-                await CreateBlogDocument(newBlogDocument);
-                return new List<BlogDocument> { newBlogDocument };
+                // Log the actual error for debugging
+                Console.WriteLine($"GetBlogPosts failed: {ex.Message}");
+                Console.WriteLine($"Stack trace: {ex.StackTrace}");
+                
+                try
+                {
+                    // If no blog document exists, try to create one
+                    var newBlogDocument = new BlogDocument();
+                    var createResult = await CreateBlogDocument(newBlogDocument);
+                    if (createResult)
+                    {
+                        return new List<BlogDocument> { newBlogDocument };
+                    }
+                    else
+                    {
+                        throw new Exception($"Failed to create new blog document. Original error: {ex.Message}");
+                    }
+                }
+                catch (Exception createEx)
+                {
+                    throw new Exception($"Failed to get or create blog document. Original error: {ex.Message}, Create error: {createEx.Message}");
+                }
             }
         }
 
@@ -212,6 +273,12 @@ namespace AikidoLive.Services.DBConnector
         {
             try
             {
+                // Check if database discovery was successful
+                if (_databasesDictionary == null || !_databasesDictionary.Any())
+                {
+                    throw new InvalidOperationException("Database discovery failed. No databases found in _databasesDictionary.");
+                }
+
                 string databaseName = _databasesDictionary.Keys.First();
                 string containerName = _databasesDictionary.Values.First().First();
 
@@ -219,8 +286,10 @@ namespace AikidoLive.Services.DBConnector
                 await _container.CreateItemAsync(blogDocument);
                 return true;
             }
-            catch (Exception)
+            catch (Exception ex)
             {
+                Console.WriteLine($"CreateBlogDocument failed: {ex.Message}");
+                Console.WriteLine($"Stack trace: {ex.StackTrace}");
                 return false;
             }
         }
@@ -229,6 +298,12 @@ namespace AikidoLive.Services.DBConnector
         {
             try
             {
+                // Check if database discovery was successful
+                if (_databasesDictionary == null || !_databasesDictionary.Any())
+                {
+                    throw new InvalidOperationException("Database discovery failed. No databases found in _databasesDictionary.");
+                }
+
                 string databaseName = _databasesDictionary.Keys.First();
                 string containerName = _databasesDictionary.Values.First().First();
 
@@ -236,8 +311,10 @@ namespace AikidoLive.Services.DBConnector
                 await _container.ReplaceItemAsync(blogDocument, blogDocument.id);
                 return true;
             }
-            catch (Exception)
+            catch (Exception ex)
             {
+                Console.WriteLine($"UpdateBlogDocument failed: {ex.Message}");
+                Console.WriteLine($"Stack trace: {ex.StackTrace}");
                 return false;
             }
         }
