@@ -47,6 +47,9 @@ builder.Services.AddSingleton(x =>
 // Add Authentication Services
 builder.Services.AddScoped<IAuthService, AuthService>();
 
+// Add Blog Service
+builder.Services.AddScoped<AikidoLive.Services.Blog.IBlogService, AikidoLive.Services.Blog.BlogService>();
+
 var app = builder.Build();
 
 // Configure the HTTP request pipeline.

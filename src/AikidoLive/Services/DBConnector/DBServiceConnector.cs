@@ -17,6 +17,7 @@ namespace AikidoLive.Services.DBConnector
         private string _libraryDbName;
         private string _usersDBName;
         private string _playlistsDBName;
+        private string _blogDBName;
 
         public DBServiceConnector(IConfiguration configuration, CosmosClient client)
         {
@@ -31,6 +32,9 @@ namespace AikidoLive.Services.DBConnector
 
             var playlistsDbSettings = configuration.GetSection("playlistsDB");
             _playlistsDBName = playlistsDbSettings["document"] ?? "";
+
+            var blogDbSettings = configuration.GetSection("blogDB");
+            _blogDBName = blogDbSettings["document"] ?? "";
 
             _databases = GetDatabasesListAsync().GetAwaiter().GetResult();
         }
@@ -170,6 +174,72 @@ namespace AikidoLive.Services.DBConnector
 
             return containers;
         }
-    }
 
+        // Blog-related methods
+        public async Task<List<BlogDocument>> GetBlogPosts()
+        {
+            try
+            {
+                string databaseName = _databasesDictionary.Keys.First();
+                string containerName = _databasesDictionary.Values.First().First();
+
+                _container = _client.GetContainer(databaseName, containerName);
+                
+                var query = new QueryDefinition("SELECT * FROM c WHERE c.id = @id")
+                    .WithParameter("@id", _blogDBName);
+                
+                var iterator = _container.GetItemQueryIterator<BlogDocument>(query);
+                var blogDocuments = new List<BlogDocument>();
+
+                while (iterator.HasMoreResults)
+                {
+                    var response = await iterator.ReadNextAsync();
+                    blogDocuments.AddRange(response.ToList());
+                }
+
+                return blogDocuments;
+            }
+            catch (Exception ex)
+            {
+                // If no blog document exists, create one
+                var newBlogDocument = new BlogDocument();
+                await CreateBlogDocument(newBlogDocument);
+                return new List<BlogDocument> { newBlogDocument };
+            }
+        }
+
+        public async Task<bool> CreateBlogDocument(BlogDocument blogDocument)
+        {
+            try
+            {
+                string databaseName = _databasesDictionary.Keys.First();
+                string containerName = _databasesDictionary.Values.First().First();
+
+                _container = _client.GetContainer(databaseName, containerName);
+                await _container.CreateItemAsync(blogDocument);
+                return true;
+            }
+            catch (Exception)
+            {
+                return false;
+            }
+        }
+
+        public async Task<bool> UpdateBlogDocument(BlogDocument blogDocument)
+        {
+            try
+            {
+                string databaseName = _databasesDictionary.Keys.First();
+                string containerName = _databasesDictionary.Values.First().First();
+
+                _container = _client.GetContainer(databaseName, containerName);
+                await _container.ReplaceItemAsync(blogDocument, blogDocument.id);
+                return true;
+            }
+            catch (Exception)
+            {
+                return false;
+            }
+        }
+    }
 }
