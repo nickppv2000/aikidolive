@@ -39,6 +39,14 @@ namespace AikidoLive.Pages.Account
                 return Page();
             }
 
+            // First check if user exists and email is confirmed
+            var userByEmail = await _authService.GetUserByEmailAsync(LoginInput.Email);
+            if (userByEmail != null && !userByEmail.IsEmailConfirmed)
+            {
+                ErrorMessage = "Please confirm your email address before logging in. Check your email for a confirmation link.";
+                return Page();
+            }
+
             var user = await _authService.AuthenticateAsync(LoginInput.Email, LoginInput.Password);
 
             if (user == null)

@@ -1,8 +1,8 @@
 using Microsoft.Azure.Cosmos;
 using AikidoLive;
 using AikidoLive.Services.DBConnector;
-
 using AikidoLive.Services.Authentication;
+using AikidoLive.Services.Email;
 using Microsoft.AspNetCore.Authentication.Cookies;
 using System;
 
@@ -46,6 +46,12 @@ builder.Services.AddSingleton(x =>
 
 // Add Authentication Services
 builder.Services.AddScoped<IAuthService, AuthService>();
+
+// Add Email Services
+builder.Services.AddScoped<IEmailService, SendGridEmailService>();
+
+// Add HttpContextAccessor for URL generation in AuthService
+builder.Services.AddHttpContextAccessor();
 
 var app = builder.Build();
 

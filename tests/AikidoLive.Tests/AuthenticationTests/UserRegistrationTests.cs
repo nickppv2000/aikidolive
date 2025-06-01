@@ -1,6 +1,8 @@
 using AikidoLive.DataModels;
 using AikidoLive.Services.Authentication;
 using AikidoLive.Services.DBConnector;
+using AikidoLive.Services.Email;
+using Microsoft.AspNetCore.Http;
 using Microsoft.Azure.Cosmos;
 using Microsoft.Extensions.Configuration;
 using Moq;
@@ -19,6 +21,8 @@ namespace AikidoLive.Tests.AuthenticationTests
         private readonly Mock<IConfiguration> _mockConfiguration;
         private readonly Mock<FeedIterator<UserList>> _mockFeedIterator;
         private readonly Mock<FeedResponse<UserList>> _mockFeedResponse;
+        private readonly Mock<IEmailService> _mockEmailService;
+        private readonly Mock<IHttpContextAccessor> _mockHttpContextAccessor;
         
         public UserRegistrationTests()
         {
@@ -28,6 +32,20 @@ namespace AikidoLive.Tests.AuthenticationTests
             _mockConfiguration = new Mock<IConfiguration>();
             _mockFeedIterator = new Mock<FeedIterator<UserList>>();
             _mockFeedResponse = new Mock<FeedResponse<UserList>>();
+            _mockEmailService = new Mock<IEmailService>();
+            _mockHttpContextAccessor = new Mock<IHttpContextAccessor>();
+
+            // Setup email service to return true by default
+            _mockEmailService.Setup(x => x.SendConfirmationEmailAsync(It.IsAny<string>(), It.IsAny<string>(), It.IsAny<string>()))
+                .ReturnsAsync(true);
+
+            // Setup HttpContextAccessor for URL generation
+            var mockHttpContext = new Mock<HttpContext>();
+            var mockRequest = new Mock<HttpRequest>();
+            mockRequest.Setup(x => x.Scheme).Returns("https");
+            mockRequest.Setup(x => x.Host).Returns(new HostString("localhost:5001"));
+            mockHttpContext.Setup(x => x.Request).Returns(mockRequest.Object);
+            _mockHttpContextAccessor.Setup(x => x.HttpContext).Returns(mockHttpContext.Object);
             
             // Setup configuration sections
             Mock<IConfigurationSection> mockLibrarySection = new Mock<IConfigurationSection>();
@@ -128,7 +146,7 @@ namespace AikidoLive.Tests.AuthenticationTests
                 .ReturnsAsync(new Mock<ItemResponse<UserList>>().Object);
             
             var dbConnector = new DBServiceConnector(_mockConfiguration.Object, _mockCosmosClient.Object);
-            var authService = new AuthService(dbConnector);
+            var authService = new AuthService(dbConnector, _mockEmailService.Object, _mockHttpContextAccessor.Object, _mockConfiguration.Object);
             
             var registerModel = new RegisterModel
             {
@@ -148,6 +166,16 @@ namespace AikidoLive.Tests.AuthenticationTests
             Assert.Equal("test@example.com", result.Email);
             Assert.Equal("User", result.Role);
             Assert.NotEqual("Password123!", result.Password); // Password should be hashed
+            Assert.False(result.IsEmailConfirmed); // Email should not be confirmed initially
+            Assert.NotNull(result.EmailConfirmationToken); // Should have confirmation token
+            Assert.NotNull(result.EmailConfirmationTokenExpiry); // Should have expiry
+            
+            // Verify confirmation email was sent
+            _mockEmailService.Verify(x => x.SendConfirmationEmailAsync(
+                "test@example.com", 
+                "Test", 
+                It.Is<string>(link => link.Contains("ConfirmEmail") && link.Contains("token="))), 
+                Times.Once);
             
             // Verify the user was added to the list
             _mockContainer.Verify(c => c.ReplaceItemAsync(
@@ -188,7 +216,7 @@ namespace AikidoLive.Tests.AuthenticationTests
                 .ReturnsAsync(_mockFeedResponse.Object);
             
             var dbConnector = new DBServiceConnector(_mockConfiguration.Object, _mockCosmosClient.Object);
-            var authService = new AuthService(dbConnector);
+            var authService = new AuthService(dbConnector, _mockEmailService.Object, _mockHttpContextAccessor.Object, _mockConfiguration.Object);
             
             var registerModel = new RegisterModel
             {
