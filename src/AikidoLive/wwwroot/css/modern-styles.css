@@ -718,7 +718,7 @@ body.mobile-menu-open {
     transform: translateY(0);
     opacity: 1;
     visibility: visible;
-    max-height: 400px; /* Adjust based on content */
+    max-height: 500px; /* Increased to accommodate all menu items */
   }
     .nav-container.active .nav-modern {
     display: flex !important; /* Show nav when menu is active - use !important for specificity */
@@ -747,6 +747,7 @@ body.mobile-menu-open {
   .nav-container.active .nav-modern li:nth-child(4) { transition-delay: 0.25s; }
   .nav-container.active .nav-modern li:nth-child(5) { transition-delay: 0.3s; }
   .nav-container.active .nav-modern li:nth-child(6) { transition-delay: 0.35s; }
+  .nav-container.active .nav-modern li:nth-child(7) { transition-delay: 0.4s; }
   
   .nav-modern a {
     display: block;
@@ -758,10 +759,38 @@ body.mobile-menu-open {
     transition: all var(--transition-fast);
   }
   
+  /* Enhanced button styling for mobile */
+  .nav-modern .btn {
+    margin: var(--spacing-xs) var(--spacing-lg);
+    padding: var(--spacing-md);
+    text-align: center;
+    border-radius: var(--radius-md);
+    font-weight: 600;
+    min-height: 44px; /* Ensure proper touch target size */
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+  
   .nav-modern a:hover {
     background-color: rgba(255, 255, 255, 0.15);
     transform: translateX(5px);
     padding-left: calc(var(--spacing-lg) + 5px);
+  }
+  
+  /* Button hover states on mobile */
+  .nav-modern .btn:hover {
+    transform: translateX(0); /* Override the translateX for buttons */
+    padding-left: var(--spacing-md); /* Keep original padding */
+  }
+  
+  .nav-modern .btn-secondary:hover {
+    background-color: rgba(255, 255, 255, 0.2);
+    border-color: rgba(255, 255, 255, 0.3);
+  }
+  
+  .nav-modern .btn-primary:hover {
+    background-color: rgba(52, 152, 219, 0.8);
   }
   
   .nav-modern li:last-child a {
