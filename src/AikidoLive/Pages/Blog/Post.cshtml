@@ -31,6 +31,13 @@ else
             {
                 <a href="/Blog/Edit/@Model.BlogPost.Id" class="btn btn-primary" style="margin-left: 0.5rem;">✏️ Edit</a>
             }
+            @if (Model.CanDelete)
+            {
+                <form method="post" asp-page-handler="DeletePost" asp-route-id="@Model.BlogPost.Id" style="display: inline; margin-left: 0.5rem;" 
+                      onsubmit="return confirm('Are you sure you want to delete this blog post? This action cannot be undone.');">
+                    <button type="submit" class="btn btn-danger">🗑️ Delete Post</button>
+                </form>
+            }
         </div>
     </div>
 
@@ -60,11 +67,11 @@ else
                             <button type="submit" class="btn @(Model.IsAppreciated ? "btn-danger" : "btn-outline-danger")" style="margin-right: 1rem;">
                                 @if (Model.IsAppreciated)
                                 {
-                                    <span>❤️ Appreciated (@Model.BlogPost.AppreciatedBy.Count)</span>
+                                    <span>❤️ (@Model.BlogPost.AppreciatedBy.Count)</span>
                                 }
                                 else
                                 {
-                                    <span>🤍 Appreciate (@Model.BlogPost.AppreciatedBy.Count)</span>
+                                    <span>🤍 (@Model.BlogPost.AppreciatedBy.Count)</span>
                                 }
                             </button>
                         </form>
@@ -132,11 +139,28 @@ else
                     @foreach (var comment in Model.BlogPost.Comments.OrderByDescending(c => c.CreatedAt))
                     {
                         <div style="border-bottom: 1px solid #eee; padding: 1rem 0; margin-bottom: 1rem;">
-                            <div style="font-weight: 600; color: #333; margin-bottom: 0.5rem;">
-                                @comment.AuthorName
-                                <span style="font-weight: normal; color: #666; font-size: 0.9rem;">
-                                    • @comment.CreatedAt.ToString("MMM dd, yyyy 'at' h:mm tt")
-                                </span>
+                            <div style="font-weight: 600; color: #333; margin-bottom: 0.5rem; display: flex; justify-content: space-between; align-items: center;">
+                                <div>
+                                    @comment.AuthorName
+                                    <span style="font-weight: normal; color: #666; font-size: 0.9rem;">
+                                        • @comment.CreatedAt.ToString("MMM dd, yyyy 'at' h:mm tt")
+                                    </span>
+                                </div>
+                                @if (User?.Identity?.IsAuthenticated == true)
+                                {
+                                    var currentUserEmail = User?.Identity?.Name ?? "";
+                                    var currentUserRole = User?.FindFirst(System.Security.Claims.ClaimTypes.Role)?.Value ?? "";
+                                    var canDeleteComment = currentUserRole.Equals("admin", StringComparison.OrdinalIgnoreCase) ||
+                                                         comment.AuthorEmail.Equals(currentUserEmail, StringComparison.OrdinalIgnoreCase);
+                                    
+                                    if (canDeleteComment)
+                                    {
+                                        <form method="post" asp-page-handler="DeleteComment" asp-route-id="@Model.BlogPost.Id" asp-route-commentId="@comment.Id" 
+                                              style="display: inline;" onsubmit="return confirm('Are you sure you want to delete this comment?');">
+                                            <button type="submit" class="btn btn-sm btn-outline-danger" style="padding: 0.2rem 0.5rem; font-size: 0.8rem;">🗑️</button>
+                                        </form>
+                                    }
+                                }
                             </div>
                             <div style="color: #555; line-height: 1.5;">
                                 @comment.Content

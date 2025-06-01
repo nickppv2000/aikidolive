@@ -16,6 +16,7 @@ namespace AikidoLive.Services.Blog
         Task<bool> UpdateBlogPostAsync(BlogPost blogPost);
         Task<bool> DeleteBlogPostAsync(string postId);
         Task<bool> AddCommentAsync(string postId, Comment comment);
+        Task<bool> DeleteCommentAsync(string postId, string commentId);
         Task<bool> ToggleAppreciationAsync(string postId, string userEmail);
         Task<bool> IncrementViewCountAsync(string postId);
     }
@@ -163,6 +164,28 @@ namespace AikidoLive.Services.Blog
             comment.BlogPostId = postId;
             post.Comments.Add(comment);
 
+            return await _dbServiceConnector.UpdateBlogDocument(blogDocument);
+        }
+
+        public async Task<bool> DeleteCommentAsync(string postId, string commentId)
+        {
+            var blogDocuments = await _dbServiceConnector.GetBlogPosts();
+            if (blogDocuments == null || !blogDocuments.Any())
+                return false;
+
+            var blogDocument = blogDocuments.FirstOrDefault();
+            if (blogDocument?.BlogPosts == null)
+                return false;
+
+            var post = blogDocument.BlogPosts.FirstOrDefault(p => p.Id == postId);
+            if (post == null)
+                return false;
+
+            var commentToRemove = post.Comments.FirstOrDefault(c => c.Id == commentId);
+            if (commentToRemove == null)
+                return false;
+
+            post.Comments.Remove(commentToRemove);
             return await _dbServiceConnector.UpdateBlogDocument(blogDocument);
         }
 

@@ -12,6 +12,7 @@ namespace AikidoLive.Pages.BlogManagement
 
         public BlogPost? BlogPost { get; set; }
         public bool CanEdit { get; set; }
+        public bool CanDelete { get; set; }
         public bool IsAppreciated { get; set; }
         
         [BindProperty]
@@ -44,8 +45,15 @@ namespace AikidoLive.Pages.BlogManagement
 
             // Check if current user can edit this post
             var currentUserEmail = User?.Identity?.Name ?? "";
+            var currentUserRole = User?.FindFirst(ClaimTypes.Role)?.Value ?? "";
+            
             CanEdit = User?.Identity?.IsAuthenticated == true && 
                      BlogPost.AuthorEmail.Equals(currentUserEmail, StringComparison.OrdinalIgnoreCase);
+            
+            // Admin users can delete any post, regular users can only delete their own posts
+            CanDelete = User?.Identity?.IsAuthenticated == true && 
+                       (currentUserRole.Equals("admin", StringComparison.OrdinalIgnoreCase) ||
+                        BlogPost.AuthorEmail.Equals(currentUserEmail, StringComparison.OrdinalIgnoreCase));
 
             // Check if current user has appreciated this post
             IsAppreciated = User?.Identity?.IsAuthenticated == true && 
@@ -133,6 +141,89 @@ namespace AikidoLive.Pages.BlogManagement
             return RedirectToPage("/Blog/Post", new { id = id });
         }
 
+        public async Task<IActionResult> OnPostDeletePostAsync(string id)
+        {
+            if (!User?.Identity?.IsAuthenticated == true || string.IsNullOrEmpty(id))
+            {
+                return NotFound();
+            }
+
+            // Check if user has permission to delete
+            var blogPost = await _blogService.GetBlogPostByIdAsync(id);
+            if (blogPost == null)
+            {
+                return NotFound();
+            }
+
+            var currentUserEmail = User?.Identity?.Name ?? "";
+            var currentUserRole = User?.FindFirst(ClaimTypes.Role)?.Value ?? "";
+            
+            bool canDelete = currentUserRole.Equals("admin", StringComparison.OrdinalIgnoreCase) ||
+                           blogPost.AuthorEmail.Equals(currentUserEmail, StringComparison.OrdinalIgnoreCase);
+            
+            if (!canDelete)
+            {
+                return Forbid();
+            }
+
+            try
+            {
+                await _blogService.DeleteBlogPostAsync(id);
+                return RedirectToPage("/Blog");
+            }
+            catch (Exception)
+            {
+                ErrorMessage = "Failed to delete blog post. Please try again.";
+                await LoadPostData(id);
+                return Page();
+            }
+        }
+
+        public async Task<IActionResult> OnPostDeleteCommentAsync(string id, string commentId)
+        {
+            if (!User?.Identity?.IsAuthenticated == true || string.IsNullOrEmpty(id) || string.IsNullOrEmpty(commentId))
+            {
+                return NotFound();
+            }
+
+            // Check if user has permission to delete (admin or comment author)
+            var blogPost = await _blogService.GetBlogPostByIdAsync(id);
+            if (blogPost == null)
+            {
+                return NotFound();
+            }
+
+            var comment = blogPost.Comments.FirstOrDefault(c => c.Id == commentId);
+            if (comment == null)
+            {
+                return NotFound();
+            }
+
+            var currentUserEmail = User?.Identity?.Name ?? "";
+            var currentUserRole = User?.FindFirst(ClaimTypes.Role)?.Value ?? "";
+            
+            bool canDelete = currentUserRole.Equals("admin", StringComparison.OrdinalIgnoreCase) ||
+                           comment.AuthorEmail.Equals(currentUserEmail, StringComparison.OrdinalIgnoreCase);
+            
+            if (!canDelete)
+            {
+                return Forbid();
+            }
+
+            try
+            {
+                await _blogService.DeleteCommentAsync(id, commentId);
+                SuccessMessage = "Comment deleted successfully.";
+            }
+            catch (Exception)
+            {
+                ErrorMessage = "Failed to delete comment. Please try again.";
+            }
+
+            await LoadPostData(id);
+            return Page();
+        }
+
         private async Task LoadPostData(string id)
         {
             BlogPost = await _blogService.GetBlogPostByIdAsync(id);
@@ -140,8 +231,15 @@ namespace AikidoLive.Pages.BlogManagement
             if (BlogPost != null)
             {
                 var currentUserEmail = User?.Identity?.Name ?? "";
+                var currentUserRole = User?.FindFirst(ClaimTypes.Role)?.Value ?? "";
+                
                 CanEdit = User?.Identity?.IsAuthenticated == true && 
                          BlogPost.AuthorEmail.Equals(currentUserEmail, StringComparison.OrdinalIgnoreCase);
+                         
+                CanDelete = User?.Identity?.IsAuthenticated == true && 
+                           (currentUserRole.Equals("admin", StringComparison.OrdinalIgnoreCase) ||
+                            BlogPost.AuthorEmail.Equals(currentUserEmail, StringComparison.OrdinalIgnoreCase));
+                            
                 IsAppreciated = User?.Identity?.IsAuthenticated == true && 
                                BlogPost.AppreciatedBy.Contains(currentUserEmail);
             }
