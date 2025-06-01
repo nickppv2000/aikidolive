@@ -78,18 +78,33 @@ namespace AikidoLive.Services.Blog
         {
             var blogDocuments = await _dbServiceConnector.GetBlogPosts();
             BlogDocument blogDocument;
+            bool isNewDocument = false;
 
             if (blogDocuments == null || !blogDocuments.Any())
             {
                 blogDocument = new BlogDocument();
+                isNewDocument = true;
             }
             else
             {
                 blogDocument = blogDocuments.FirstOrDefault() ?? new BlogDocument();
+                if (blogDocument.BlogPosts == null)
+                {
+                    blogDocument.BlogPosts = new List<BlogPost>();
+                }
             }
 
             blogDocument.BlogPosts.Add(blogPost);
-            return await _dbServiceConnector.UpdateBlogDocument(blogDocument);
+            
+            // Use CreateBlogDocument for new documents, UpdateBlogDocument for existing ones
+            if (isNewDocument)
+            {
+                return await _dbServiceConnector.CreateBlogDocument(blogDocument);
+            }
+            else
+            {
+                return await _dbServiceConnector.UpdateBlogDocument(blogDocument);
+            }
         }
 
         public async Task<bool> UpdateBlogPostAsync(BlogPost updatedBlogPost)

@@ -176,7 +176,7 @@ namespace AikidoLive.Tests.BlogTests
             mockDbConnector.Setup(db => db.GetBlogPosts())
                 .ReturnsAsync(new List<BlogDocument>());
             
-            mockDbConnector.Setup(db => db.UpdateBlogDocument(It.IsAny<BlogDocument>()))
+            mockDbConnector.Setup(db => db.CreateBlogDocument(It.IsAny<BlogDocument>()))
                 .ReturnsAsync(true);
 
             var blogService = new BlogService(mockDbConnector.Object);
@@ -197,8 +197,8 @@ namespace AikidoLive.Tests.BlogTests
             _output.WriteLine($"Blog post creation result: {result}");
             Assert.True(result);
             
-            // Verify a new document was created and updated
-            mockDbConnector.Verify(db => db.UpdateBlogDocument(It.Is<BlogDocument>(doc => 
+            // Verify a new document was created
+            mockDbConnector.Verify(db => db.CreateBlogDocument(It.Is<BlogDocument>(doc => 
                 doc.BlogPosts.Count == 1 && doc.BlogPosts[0].Title == testPost.Title)), Times.Once);
         }
 
@@ -281,7 +281,7 @@ namespace AikidoLive.Tests.BlogTests
             mockDbConnector.Setup(db => db.GetBlogPosts())
                 .ReturnsAsync((List<BlogDocument>)null);
             
-            mockDbConnector.Setup(db => db.UpdateBlogDocument(It.IsAny<BlogDocument>()))
+            mockDbConnector.Setup(db => db.CreateBlogDocument(It.IsAny<BlogDocument>()))
                 .ReturnsAsync(true);
 
             var blogService = new BlogService(mockDbConnector.Object);
@@ -303,7 +303,60 @@ namespace AikidoLive.Tests.BlogTests
             Assert.True(result);
             
             // Should create a new document when null is returned
-            mockDbConnector.Verify(db => db.UpdateBlogDocument(It.IsAny<BlogDocument>()), Times.Once);
+            mockDbConnector.Verify(db => db.CreateBlogDocument(It.IsAny<BlogDocument>()), Times.Once);
+        }
+
+        [Fact]
+        public async Task CreateBlogPost_FirstPostEver_ShouldCreateNewDocumentNot404()
+        {
+            _output.WriteLine("Testing blog post creation for the very first post (reproducing the 404 fix)...");
+
+            // Arrange - This reproduces the exact scenario from the error report
+            var mockDbConnector = new Mock<IDBServiceConnector>();
+            
+            // Simulate the scenario that was causing 404: no blog document exists
+            mockDbConnector.Setup(db => db.GetBlogPosts())
+                .ReturnsAsync(new List<BlogDocument>()); // Empty list means no blog document exists
+            
+            // Mock CreateBlogDocument to succeed (this is what should be called)
+            mockDbConnector.Setup(db => db.CreateBlogDocument(It.IsAny<BlogDocument>()))
+                .ReturnsAsync(true);
+            
+            // Mock UpdateBlogDocument to fail with 404 (this is what was happening before)
+            mockDbConnector.Setup(db => db.UpdateBlogDocument(It.IsAny<BlogDocument>()))
+                .ReturnsAsync(false); // This would have been the 404 error
+
+            var blogService = new BlogService(mockDbConnector.Object);
+
+            var testPost = new BlogPost
+            {
+                Id = Guid.NewGuid().ToString(),
+                Title = "First Blog Post Ever",
+                Content = "This is the very first blog post on the platform",
+                AuthorEmail = "first.user@aikidolive.com",
+                AuthorName = "First User",
+                IsPublished = true,
+                CreatedAt = DateTime.UtcNow
+            };
+
+            // Act - Try to create the first blog post ever
+            var result = await blogService.CreateBlogPostAsync(testPost);
+
+            // Assert
+            _output.WriteLine($"First blog post creation result: {result}");
+            Assert.True(result, "First blog post creation should succeed");
+            
+            // Verify that CreateBlogDocument was called (not UpdateBlogDocument which would cause 404)
+            mockDbConnector.Verify(db => db.CreateBlogDocument(It.Is<BlogDocument>(doc => 
+                doc.BlogPosts.Count == 1 && 
+                doc.BlogPosts[0].Title == testPost.Title)), Times.Once, 
+                "CreateBlogDocument should be called for the first blog post");
+            
+            // Verify that UpdateBlogDocument was NOT called (this would cause the 404 error)
+            mockDbConnector.Verify(db => db.UpdateBlogDocument(It.IsAny<BlogDocument>()), Times.Never, 
+                "UpdateBlogDocument should NOT be called when creating the first blog post");
+            
+            _output.WriteLine("✅ SUCCESS: The 404 error fix is working correctly!");
         }
 
         [Fact]

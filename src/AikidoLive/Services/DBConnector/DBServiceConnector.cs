@@ -248,24 +248,9 @@ namespace AikidoLive.Services.DBConnector
                 Console.WriteLine($"GetBlogPosts failed: {ex.Message}");
                 Console.WriteLine($"Stack trace: {ex.StackTrace}");
                 
-                try
-                {
-                    // If no blog document exists, try to create one
-                    var newBlogDocument = new BlogDocument();
-                    var createResult = await CreateBlogDocument(newBlogDocument);
-                    if (createResult)
-                    {
-                        return new List<BlogDocument> { newBlogDocument };
-                    }
-                    else
-                    {
-                        throw new Exception($"Failed to create new blog document. Original error: {ex.Message}");
-                    }
-                }
-                catch (Exception createEx)
-                {
-                    throw new Exception($"Failed to get or create blog document. Original error: {ex.Message}, Create error: {createEx.Message}");
-                }
+                // Return empty list instead of trying to create document here
+                // Let the service layer handle document creation
+                return new List<BlogDocument>();
             }
         }
 
