@@ -13,7 +13,7 @@ namespace AikidoLive.DataModels
         public string Url { get; set; }
         public string Source { get; set; }
 
-        Track()
+        public Track()
         {
             Description = "";
             Name = "";
@@ -21,7 +21,7 @@ namespace AikidoLive.DataModels
             Source = "";
         }
 
-        Track(string description, string name, string url, string source)
+        public Track(string description, string name, string url, string source)
         {
             Description = description;
             Name = name;

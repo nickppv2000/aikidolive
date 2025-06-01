@@ -104,7 +104,7 @@ namespace AikidoLive.Services.DBConnector
                 string containerName = _databasesDictionary.Values.First().First();
 
                 _container = _client.GetContainer(databaseName, containerName);
-                await _container.ReplaceItemAsync(userList, userList.id);
+                await _container.ReplaceItemAsync(userList, userList.id, new PartitionKey(userList.id));
                 return true;
             }
             catch (Exception)
@@ -133,6 +133,23 @@ namespace AikidoLive.Services.DBConnector
             }
 
             return playlistsDocuments;
+        }
+
+        public async Task<bool> UpdatePlaylists(PlaylistsDocument playlistsDocument)
+        {
+            try
+            {
+                string databaseName = _databasesDictionary.Keys.First();
+                string containerName = _databasesDictionary.Values.First().First();
+
+                _container = _client.GetContainer(databaseName, containerName);
+                await _container.ReplaceItemAsync(playlistsDocument, playlistsDocument.Id, new PartitionKey(playlistsDocument.Id));
+                return true;
+            }
+            catch (Exception)
+            {
+                return false;
+            }
         }
 
 

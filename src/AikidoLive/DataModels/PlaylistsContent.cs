@@ -10,13 +10,13 @@ namespace AikidoLive.DataModels
         public string PlaylistName { get; set; }
         public List<Track> Tracks { get; set; }
 
-        PlaylistsContent()
+        public PlaylistsContent()
         {
             PlaylistName = "";
             Tracks = new List<Track>();
         }
 
-        PlaylistsContent(string playlistName, List<Track> tracks)
+        public PlaylistsContent(string playlistName, List<Track> tracks)
         {
             PlaylistName = playlistName;
             Tracks = tracks;
