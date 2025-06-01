@@ -9,5 +9,7 @@ namespace AikidoLive.Services.Authentication
         string HashPassword(string password);
         bool VerifyPassword(string password, string hashedPassword);
         Task<User> RegisterUserAsync(RegisterModel model);
+        Task<User> GetUserByEmailAsync(string email);
+        Task<bool> UpdateUserAsync(string originalEmail, User updatedUser);
     }
 }

@@ -85,5 +85,57 @@ namespace AikidoLive.Services.Authentication
             
             return newUser;
         }
+
+        public async Task<User> GetUserByEmailAsync(string email)
+        {
+            var users = await _dbServiceConnector.GetUsers();
+            if (users == null || !users.Any())
+                return null;
+
+            var userList = users.FirstOrDefault();
+            if (userList?.Users == null)
+                return null;
+
+            return userList.Users.FirstOrDefault(u => 
+                u.Email.Equals(email, StringComparison.OrdinalIgnoreCase));
+        }
+
+        public async Task<bool> UpdateUserAsync(string originalEmail, User updatedUser)
+        {
+            try
+            {
+                var users = await _dbServiceConnector.GetUsers();
+                if (users == null || !users.Any())
+                    return false;
+
+                var userList = users.FirstOrDefault();
+                if (userList?.Users == null)
+                    return false;
+
+                var existingUserIndex = userList.Users.FindIndex(u => 
+                    u.Email.Equals(originalEmail, StringComparison.OrdinalIgnoreCase));
+                
+                if (existingUserIndex == -1)
+                    return false;
+
+                // Update user properties
+                userList.Users[existingUserIndex].FirstName = updatedUser.FirstName;
+                userList.Users[existingUserIndex].LastName = updatedUser.LastName;
+                userList.Users[existingUserIndex].Email = updatedUser.Email;
+                // Only update password if it's provided (not empty)
+                if (!string.IsNullOrEmpty(updatedUser.Password))
+                {
+                    userList.Users[existingUserIndex].Password = updatedUser.Password;
+                }
+                // Don't update Role - it should remain unchanged
+                
+                await _dbServiceConnector.UpdateUser(userList);
+                return true;
+            }
+            catch
+            {
+                return false;
+            }
+        }
     }
 }
