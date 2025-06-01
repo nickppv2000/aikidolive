@@ -160,11 +160,19 @@ namespace AikidoLive.Pages.BlogManagement
         {
             if (!User?.Identity?.IsAuthenticated == true)
             {
+                if (Request.Headers["X-Requested-With"] == "XMLHttpRequest")
+                {
+                    return new JsonResult(new { success = false, message = "Please log in to appreciate this post" });
+                }
                 return RedirectToPage("/Account/Login");
             }
 
             if (string.IsNullOrEmpty(id))
             {
+                if (Request.Headers["X-Requested-With"] == "XMLHttpRequest")
+                {
+                    return new JsonResult(new { success = false, message = "Invalid post ID" });
+                }
                 return NotFound();
             }
 
@@ -172,10 +180,30 @@ namespace AikidoLive.Pages.BlogManagement
             {
                 var userEmail = User?.Identity?.Name ?? "";
                 await _blogService.ToggleAppreciationAsync(id, userEmail);
+                
+                // Get updated post data for AJAX response
+                if (Request.Headers["X-Requested-With"] == "XMLHttpRequest")
+                {
+                    var updatedPost = await _blogService.GetBlogPostByIdAsync(id);
+                    if (updatedPost != null)
+                    {
+                        var isAppreciated = updatedPost.AppreciatedBy.Contains(userEmail);
+                        return new JsonResult(new 
+                        { 
+                            success = true, 
+                            isAppreciated = isAppreciated,
+                            appreciationCount = updatedPost.AppreciatedBy.Count
+                        });
+                    }
+                }
             }
-            catch (Exception)
+            catch (Exception ex)
             {
-                // Silently fail for appreciation toggle
+                if (Request.Headers["X-Requested-With"] == "XMLHttpRequest")
+                {
+                    return new JsonResult(new { success = false, message = "Failed to update appreciation: " + ex.Message });
+                }
+                // Silently fail for appreciation toggle on regular requests
             }
 
             return RedirectToPage("/Blog/Post", new { id = id });

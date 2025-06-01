@@ -63,18 +63,16 @@ else
                 <div style="border-top: 1px solid #eee; padding-top: 1.5rem; margin-top: 2rem; text-align: center;">
                     @if (User?.Identity?.IsAuthenticated == true)
                     {
-                        <form method="post" asp-page-handler="ToggleAppreciation" asp-route-id="@Model.BlogPost.Id" style="display: inline;">
-                            <button type="submit" class="btn @(Model.IsAppreciated ? "btn-danger" : "btn-outline-danger")" style="margin-right: 1rem;">
-                                @if (Model.IsAppreciated)
-                                {
-                                    <span>❤️ (@Model.BlogPost.AppreciatedBy.Count)</span>
-                                }
-                                else
-                                {
-                                    <span>🤍 (@Model.BlogPost.AppreciatedBy.Count)</span>
-                                }
-                            </button>
-                        </form>
+                        <button type="button" 
+                                id="appreciation-btn"
+                                class="btn @(Model.IsAppreciated ? "btn-danger" : "btn-outline-danger")" 
+                                style="margin-right: 1rem;"
+                                data-post-id="@Model.BlogPost.Id"
+                                data-is-appreciated="@Model.IsAppreciated.ToString().ToLower()"
+                                onclick="toggleAppreciation('@Model.BlogPost.Id')">
+                            <span id="appreciation-icon">@(Model.IsAppreciated ? "❤️" : "🤍")</span> 
+                            (<span id="appreciation-count">@Model.BlogPost.AppreciatedBy.Count</span>)
+                        </button>
                     }
                     else
                     {
@@ -417,6 +415,64 @@ function showTemporaryMessage(message, type) {
             }
         }, 300);
     }, 3000);
+}
+
+function toggleAppreciation(postId) {
+    const appreciationBtn = document.getElementById('appreciation-btn');
+    const appreciationIcon = document.getElementById('appreciation-icon');
+    const appreciationCount = document.getElementById('appreciation-count');
+    
+    // Show loading state
+    const originalContent = appreciationBtn.innerHTML;
+    appreciationBtn.innerHTML = '⏳ (...)'
+    appreciationBtn.disabled = true;
+    
+    // Create form data
+    const formData = new FormData();
+    formData.append('__RequestVerificationToken', document.querySelector('input[name="__RequestVerificationToken"]').value);
+    
+    // Make AJAX request
+    fetch(window.location.pathname + '?handler=ToggleAppreciation&id=' + postId, {
+        method: 'POST',
+        body: formData,
+        headers: {
+            'X-Requested-With': 'XMLHttpRequest',
+            'RequestVerificationToken': document.querySelector('input[name="__RequestVerificationToken"]').value
+        }
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.success) {
+            // Update the button appearance and count
+            const isAppreciated = data.isAppreciated;
+            appreciationIcon.textContent = isAppreciated ? '❤️' : '🤍';
+            appreciationCount.textContent = data.appreciationCount;
+            
+            // Update button classes
+            if (isAppreciated) {
+                appreciationBtn.className = 'btn btn-danger';
+            } else {
+                appreciationBtn.className = 'btn btn-outline-danger';
+            }
+            
+            // Update data attribute and restore proper content
+            appreciationBtn.setAttribute('data-is-appreciated', isAppreciated.toString());
+            appreciationBtn.innerHTML = `<span id="appreciation-icon">${isAppreciated ? '❤️' : '🤍'}</span> (<span id="appreciation-count">${data.appreciationCount}</span>)`;
+            appreciationBtn.disabled = false;
+        } else {
+            // Restore original content on error
+            appreciationBtn.innerHTML = originalContent;
+            appreciationBtn.disabled = false;
+            alert('Failed to update appreciation: ' + (data.message || 'Please try again.'));
+        }
+    })
+    .catch(error => {
+        // Restore original content on error
+        appreciationBtn.innerHTML = originalContent;
+        appreciationBtn.disabled = false;
+        alert('An error occurred while updating appreciation. Please try again.');
+        console.error('Error:', error);
+    });
 }
 </script>
 
