@@ -85,6 +85,7 @@ namespace AikidoLive.Pages
                 
                 if (_playlistsDocuments == null || !_playlistsDocuments.Any())
                 {
+                    _logger.LogWarning("No playlists found in the database");
                     ErrorMessage = "No playlists found in the database.";
                     await OnGetAsync();
                     return Page();
@@ -93,16 +94,24 @@ namespace AikidoLive.Pages
                 var playlistDoc = _playlistsDocuments.FirstOrDefault();
                 if (playlistDoc?.PlaylistsContents == null)
                 {
+                    _logger.LogWarning("Playlist document structure is invalid. PlaylistDoc null: {IsNull}, PlaylistsContents null: {IsContentsNull}", 
+                        playlistDoc == null, playlistDoc?.PlaylistsContents == null);
                     ErrorMessage = "Playlist document structure is invalid.";
                     await OnGetAsync();
                     return Page();
                 }
 
-                var targetPlaylist = playlistDoc.PlaylistsContents
+                _logger.LogInformation("Playlist document loaded. ID: {DocumentId}, Playlists count: {PlaylistCount}", 
+                    playlistDoc.Id, playlistDoc.PlaylistsContents?.Count ?? 0);
+
+                var targetPlaylist = playlistDoc.PlaylistsContents?
                     .FirstOrDefault(p => p.PlaylistName == AddTrackInput.PlaylistName);
 
                 if (targetPlaylist == null)
                 {
+                    _logger.LogWarning("Target playlist '{PlaylistName}' not found. Available playlists: {AvailablePlaylists}",
+                        AddTrackInput.PlaylistName, 
+                        string.Join(", ", playlistDoc.PlaylistsContents.Select(p => p.PlaylistName)));
                     ErrorMessage = $"Playlist '{AddTrackInput.PlaylistName}' not found.";
                     await OnGetAsync();
                     return Page();
@@ -116,19 +125,26 @@ namespace AikidoLive.Pages
                     Source = AddTrackInput.Source
                 };
 
+                _logger.LogInformation("Adding track '{TrackName}' to playlist '{PlaylistName}'. Processed URL: {ProcessedUrl}", 
+                    newTrack.Name, targetPlaylist.PlaylistName, newTrack.Url);
+
                 targetPlaylist.Tracks.Add(newTrack);
 
                 bool updateSuccess = await _dbServiceConnector.UpdatePlaylists(playlistDoc);
                 
                 if (updateSuccess)
                 {
+                    _logger.LogInformation("Track '{TrackName}' successfully added to playlist '{PlaylistName}'", 
+                        newTrack.Name, targetPlaylist.PlaylistName);
                     SuccessMessage = $"Track '{newTrack.Name}' added successfully to playlist '{targetPlaylist.PlaylistName}'.";
                     // Clear the form
                     AddTrackInput = new AddTrackInputModel();
                 }
                 else
                 {
-                    ErrorMessage = "Failed to update the playlist in the database.";
+                    _logger.LogError("Failed to update playlist in database. Document ID: {DocumentId}, Playlist: {PlaylistName}, Track: {TrackName}", 
+                        playlistDoc.Id, AddTrackInput.PlaylistName, AddTrackInput.TrackName);
+                    ErrorMessage = "Failed to update the playlist in the database. Please check the server logs for more details.";
                 }
             }
             catch (Exception ex)

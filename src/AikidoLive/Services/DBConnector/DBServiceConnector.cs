@@ -139,15 +139,44 @@ namespace AikidoLive.Services.DBConnector
         {
             try
             {
+                if (playlistsDocument == null)
+                {
+                    System.Diagnostics.Debug.WriteLine("UpdatePlaylists: playlistsDocument is null");
+                    return false;
+                }
+
+                if (string.IsNullOrEmpty(playlistsDocument.Id))
+                {
+                    System.Diagnostics.Debug.WriteLine("UpdatePlaylists: playlistsDocument.Id is null or empty");
+                    return false;
+                }
+
+                if (!_databasesDictionary.Any())
+                {
+                    System.Diagnostics.Debug.WriteLine("UpdatePlaylists: _databasesDictionary is empty");
+                    return false;
+                }
+
                 string databaseName = _databasesDictionary.Keys.First();
                 string containerName = _databasesDictionary.Values.First().First();
 
+                System.Diagnostics.Debug.WriteLine($"UpdatePlaylists: Database={databaseName}, Container={containerName}, DocumentId={playlistsDocument.Id}");
+
                 _container = _client.GetContainer(databaseName, containerName);
-                await _container.ReplaceItemAsync(playlistsDocument, playlistsDocument.Id, new PartitionKey(playlistsDocument.Id));
+                var result = await _container.ReplaceItemAsync(playlistsDocument, playlistsDocument.Id, new PartitionKey(playlistsDocument.Id));
+                
+                System.Diagnostics.Debug.WriteLine($"UpdatePlaylists: Success! Status Code={result.StatusCode}");
                 return true;
             }
-            catch (Exception)
+            catch (Exception ex)
             {
+                // Log the exception details for debugging
+                System.Diagnostics.Debug.WriteLine($"UpdatePlaylists failed: {ex.Message}");
+                System.Diagnostics.Debug.WriteLine($"Stack trace: {ex.StackTrace}");
+                if (ex.InnerException != null)
+                {
+                    System.Diagnostics.Debug.WriteLine($"Inner exception: {ex.InnerException.Message}");
+                }
                 return false;
             }
         }

@@ -9,22 +9,6 @@
     <p class="hero-subtitle fade-in-up-delay">Curated collections of Aikido training content for focused learning</p>
 </div>
 
-@if (!string.IsNullOrEmpty(Model.SuccessMessage))
-{
-    <div class="alert alert-success alert-dismissible fade show" role="alert">
-        @Model.SuccessMessage
-        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
-    </div>
-}
-
-@if (!string.IsNullOrEmpty(Model.ErrorMessage))
-{
-    <div class="alert alert-danger alert-dismissible fade show" role="alert">
-        @Model.ErrorMessage
-        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
-    </div>
-}
-
 @if (null != Model._playlistsDocuments)
 {
     <div class="library-grid">
@@ -72,6 +56,24 @@
         <div class="admin-section card" style="margin-top: 2rem;">
             <div class="card-content">
                 <h3>🔧 Admin: Add New Track to Playlist</h3>
+                
+                @* Show success/error messages near the form *@
+                @if (!string.IsNullOrEmpty(Model.SuccessMessage))
+                {
+                    <div class="alert alert-success alert-dismissible fade show" role="alert" style="margin-bottom: 1rem;">
+                        @Model.SuccessMessage
+                        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                    </div>
+                }
+
+                @if (!string.IsNullOrEmpty(Model.ErrorMessage))
+                {
+                    <div class="alert alert-danger alert-dismissible fade show" role="alert" style="margin-bottom: 1rem;">
+                        @Model.ErrorMessage
+                        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                    </div>
+                }
+                
                 <form method="post" asp-page-handler="AddTrack" class="admin-form">
                     <div class="form-group" style="margin-bottom: 1rem;">
                         <label for="playlistSelect" class="form-label">Playlist:</label>
