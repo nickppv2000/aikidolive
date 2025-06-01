@@ -41,7 +41,7 @@
                         <li><a href="/Blog" title="Blog">Blog</a></li>
                         @if (User?.Identity?.IsAuthenticated == true)
                         {
-                            <li><span class="user-greeting">Hello, @User.Identity.Name!</span></li>
+                            <li><span class="user-greeting">こんにちは, @User.FindFirst(System.Security.Claims.ClaimTypes.GivenName)?.Value!</span></li>
                             <li><a href="/Account/Logout" title="Logout" class="btn btn-secondary">Logout</a></li>
                         }
                         else
