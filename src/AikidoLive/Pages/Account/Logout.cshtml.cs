@@ -20,7 +20,7 @@ namespace AikidoLive.Pages.Account
         {
             await HttpContext.SignOutAsync(CookieAuthenticationDefaults.AuthenticationScheme);
             _logger.LogInformation("User logged out.");
-            return Page();
+            return RedirectToPage("/Index");
         }
     }
 }
