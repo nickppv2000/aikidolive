@@ -1,0 +1,33 @@
+@page
+@model AikidoLive.Pages.Account.ConfirmEmailModel
+@{
+    ViewData["Title"] = "Confirm Email";
+}
+
+<div class="auth-container">
+    <div class="auth-box">
+        <h1>Email Confirmation</h1>
+        
+        @if (Model.IsSuccess)
+        {
+            <div class="alert alert-success" role="alert">
+                ✅ @Model.Message
+            </div>
+            
+            <div class="text-center">
+                <a asp-page="/Account/Login" class="btn btn-primary">Login Now</a>
+            </div>
+        }
+        else
+        {
+            <div class="alert alert-danger" role="alert">
+                ❌ @Model.Message
+            </div>
+            
+            <div class="text-center">
+                <p>Need help? <a asp-page="/Account/Register">Try registering again</a></p>
+                <a asp-page="/Account/Login" class="btn btn-secondary">Back to Login</a>
+            </div>
+        }
+    </div>
+</div>

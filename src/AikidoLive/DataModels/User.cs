@@ -12,6 +12,11 @@ namespace AikidoLive.DataModels
         public string Email { get; set; }
         public string Role {get; set; }
         public string Password { get; set; }
+        public bool IsEmailConfirmed { get; set; }
+        public string? EmailConfirmationToken { get; set; }
+        public DateTime? EmailConfirmationTokenExpiry { get; set; }
+        public string? PasswordResetToken { get; set; }
+        public DateTime? PasswordResetTokenExpiry { get; set; }
 
         public User()
         {
@@ -20,6 +25,7 @@ namespace AikidoLive.DataModels
             Email = "";
             Role = "";
             Password = "";
+            IsEmailConfirmed = false;
         }
 
         public User(string firstName, string lastName, string email, string role, string password)
@@ -29,6 +35,7 @@ namespace AikidoLive.DataModels
             Email = email;
             Role = role;
             Password = password;
+            IsEmailConfirmed = false;
         }
     }
 }

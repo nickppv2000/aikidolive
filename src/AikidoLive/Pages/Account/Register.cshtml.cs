@@ -54,8 +54,11 @@ namespace AikidoLive.Pages.Account
                 return Page();
             }
 
-            _logger.LogInformation($"User {RegisterInput.Email} registered successfully.");
-            return RedirectToPage("/Account/Login");
+            _logger.LogInformation($"User {RegisterInput.Email} registered successfully. Email confirmation required.");
+            
+            // Redirect to a confirmation page instead of login
+            TempData["Message"] = "Registration successful! Please check your email for a confirmation link to activate your account.";
+            return RedirectToPage("/Account/EmailSent");
         }
 
         public class RegisterInputModel

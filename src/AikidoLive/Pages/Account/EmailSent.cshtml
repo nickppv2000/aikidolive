@@ -1,0 +1,20 @@
+@page
+@model AikidoLive.Pages.Account.EmailSentModel
+@{
+    ViewData["Title"] = "Email Sent";
+}
+
+<div class="auth-container">
+    <div class="auth-box">
+        <h1>📧 Email Sent</h1>
+        
+        <div class="alert alert-info" role="alert">
+            @Model.Message
+        </div>
+        
+        <div class="text-center">
+            <p>If you don't receive an email within a few minutes, please check your spam folder.</p>
+            <a asp-page="/Account/Login" class="btn btn-primary">Back to Login</a>
+        </div>
+    </div>
+</div>
