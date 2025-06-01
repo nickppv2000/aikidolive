@@ -115,7 +115,7 @@ else
                 <!-- Add Comment Form (for authenticated users) -->
                 @if (User?.Identity?.IsAuthenticated == true)
                 {
-                    <form method="post" asp-page-handler="AddComment" asp-route-id="@Model.BlogPost.Id" style="margin-bottom: 2rem;">
+                    <form id="add-comment-form" method="post" asp-page-handler="AddComment" asp-route-id="@Model.BlogPost.Id" style="margin-bottom: 2rem;">
                         <div class="form-group">
                             <label asp-for="NewComment.Content" class="form-label">Add a comment:</label>
                             <textarea asp-for="NewComment.Content" class="form-control" rows="3" 
@@ -123,7 +123,7 @@ else
                             <span asp-validation-for="NewComment.Content" class="text-danger"></span>
                         </div>
                         <input asp-for="NewComment.BlogPostId" type="hidden" />
-                        <button type="submit" class="btn btn-primary" style="margin-top: 0.5rem;">💬 Post Comment</button>
+                        <button type="button" id="add-comment-btn" onclick="addComment()" class="btn btn-primary" style="margin-top: 0.5rem;">💬 Post Comment</button>
                     </form>
                 }
                 else
@@ -266,6 +266,157 @@ function deleteComment(commentId, postId) {
         alert('An error occurred while deleting the comment. Please try again.');
         console.error('Error:', error);
     });
+}
+
+function addComment() {
+    const form = document.getElementById('add-comment-form');
+    const textArea = form.querySelector('textarea');
+    const addButton = document.getElementById('add-comment-btn');
+    const content = textArea.value.trim();
+    
+    // Basic validation
+    if (!content) {
+        alert('Please enter a comment before posting.');
+        textArea.focus();
+        return;
+    }
+    
+    if (content.length < 5) {
+        alert('Comment must be at least 5 characters long.');
+        textArea.focus();
+        return;
+    }
+    
+    if (content.length > 1000) {
+        alert('Comment must be less than 1000 characters long.');
+        textArea.focus();
+        return;
+    }
+    
+    // Show loading state
+    const originalContent = addButton.innerHTML;
+    addButton.innerHTML = '⏳ Posting...';
+    addButton.disabled = true;
+    
+    // Create form data
+    const formData = new FormData(form);
+    formData.append('__RequestVerificationToken', document.querySelector('input[name="__RequestVerificationToken"]').value);
+    
+    // Make AJAX request
+    fetch(form.action, {
+        method: 'POST',
+        body: formData,
+        headers: {
+            'X-Requested-With': 'XMLHttpRequest',
+            'RequestVerificationToken': document.querySelector('input[name="__RequestVerificationToken"]').value
+        }
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.success) {
+            // Clear the form
+            textArea.value = '';
+            
+            // Add the new comment to the DOM
+            addCommentToDOM(data.comment);
+            
+            // Update comment count in the header
+            const commentsHeader = document.querySelector('#comments-section h3.card-title');
+            const currentCount = parseInt(commentsHeader.textContent.match(/\d+/)[0]);
+            const newCount = currentCount + 1;
+            commentsHeader.textContent = `💬 Comments (${newCount})`;
+            
+            // Remove "no comments" message if it exists
+            const noCommentsMsg = document.querySelector('#comments-list div[style*="No comments yet"]');
+            if (noCommentsMsg) {
+                noCommentsMsg.remove();
+            }
+            
+            // Show success message briefly
+            showTemporaryMessage('Comment added successfully!', 'success');
+            
+        } else {
+            alert('Failed to add comment: ' + (data.message || 'Please try again.'));
+        }
+    })
+    .catch(error => {
+        alert('An error occurred while adding the comment. Please try again.');
+        console.error('Error:', error);
+    })
+    .finally(() => {
+        // Restore button
+        addButton.innerHTML = originalContent;
+        addButton.disabled = false;
+    });
+}
+
+function addCommentToDOM(comment) {
+    const commentsList = document.getElementById('comments-list');
+    const postId = document.querySelector('input[name="NewComment.BlogPostId"]').value;
+    
+    // Create the comment HTML
+    const deleteButton = comment.canDelete ? 
+        `<button type="button" 
+                class="btn btn-sm btn-outline-danger delete-comment-btn" 
+                style="padding: 0.2rem 0.5rem; font-size: 0.8rem;"
+                data-comment-id="${comment.id}"
+                onclick="deleteComment('${comment.id}', '${postId}')">
+            🗑️
+        </button>` : '';
+    
+    const commentHTML = `
+        <div id="comment-${comment.id}" style="border-bottom: 1px solid #eee; padding: 1rem 0; margin-bottom: 1rem; opacity: 0; transform: translateY(-10px);">
+            <div style="font-weight: 600; color: #333; margin-bottom: 0.5rem; display: flex; justify-content: space-between; align-items: center;">
+                <div>
+                    ${comment.authorName}
+                    <span style="font-weight: normal; color: #666; font-size: 0.9rem;">
+                        • ${comment.createdAt}
+                    </span>
+                </div>
+                ${deleteButton}
+            </div>
+            <div style="color: #555; line-height: 1.5;">
+                ${comment.content}
+            </div>
+        </div>
+    `;
+    
+    // Insert at the beginning of the comments list (newest first)
+    commentsList.insertAdjacentHTML('afterbegin', commentHTML);
+    
+    // Animate the new comment in
+    const newCommentElement = document.getElementById(`comment-${comment.id}`);
+    setTimeout(() => {
+        newCommentElement.style.transition = 'opacity 0.3s ease, transform 0.3s ease';
+        newCommentElement.style.opacity = '1';
+        newCommentElement.style.transform = 'translateY(0)';
+    }, 50);
+}
+
+function showTemporaryMessage(message, type) {
+    // Create message element
+    const messageDiv = document.createElement('div');
+    messageDiv.className = `alert alert-${type}`;
+    messageDiv.style.cssText = 'position: fixed; top: 20px; right: 20px; z-index: 1000; opacity: 0; transition: opacity 0.3s ease;';
+    messageDiv.textContent = message;
+    
+    // Add to page
+    document.body.appendChild(messageDiv);
+    
+    // Fade in
+    setTimeout(() => {
+        messageDiv.style.opacity = '1';
+    }, 50);
+    
+    // Fade out and remove after 3 seconds
+    setTimeout(() => {
+        messageDiv.style.opacity = '0';
+        setTimeout(() => {
+            if (messageDiv.parentNode) {
+                messageDiv.parentNode.removeChild(messageDiv);
+            }
+        }, 300);
+    }, 3000);
 }
 </script>
 

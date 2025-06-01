@@ -68,11 +68,20 @@ namespace AikidoLive.Pages.BlogManagement
         {
             if (!User?.Identity?.IsAuthenticated == true)
             {
+                if (Request.Headers["X-Requested-With"] == "XMLHttpRequest")
+                {
+                    return new JsonResult(new { success = false, message = "Please log in to add a comment" });
+                }
                 return RedirectToPage("/Account/Login");
             }
 
             if (!ModelState.IsValid || string.IsNullOrEmpty(id))
             {
+                if (Request.Headers["X-Requested-With"] == "XMLHttpRequest")
+                {
+                    var errors = ModelState.Values.SelectMany(v => v.Errors).Select(e => e.ErrorMessage);
+                    return new JsonResult(new { success = false, message = string.Join(", ", errors) });
+                }
                 await LoadPostData(id);
                 return Page();
             }
@@ -98,17 +107,48 @@ namespace AikidoLive.Pages.BlogManagement
 
                 if (success)
                 {
+                    // For AJAX requests, return JSON response with the new comment data
+                    if (Request.Headers["X-Requested-With"] == "XMLHttpRequest")
+                    {
+                        var currentUserRole = User?.FindFirst(ClaimTypes.Role)?.Value ?? "";
+                        var canDeleteComment = currentUserRole.Equals("admin", StringComparison.OrdinalIgnoreCase) ||
+                                             comment.AuthorEmail.Equals(userEmail, StringComparison.OrdinalIgnoreCase);
+                        
+                        return new JsonResult(new 
+                        { 
+                            success = true, 
+                            message = "Comment added successfully!",
+                            comment = new
+                            {
+                                id = comment.Id,
+                                content = comment.Content,
+                                authorName = comment.AuthorName,
+                                authorEmail = comment.AuthorEmail,
+                                createdAt = comment.CreatedAt.ToString("MMM dd, yyyy 'at' h:mm tt"),
+                                canDelete = canDeleteComment
+                            }
+                        });
+                    }
+                    
                     SuccessMessage = "Comment added successfully!";
                     NewComment = new AddCommentModel { BlogPostId = id };
                     ModelState.Clear();
                 }
                 else
                 {
+                    if (Request.Headers["X-Requested-With"] == "XMLHttpRequest")
+                    {
+                        return new JsonResult(new { success = false, message = "Failed to add comment. Please try again." });
+                    }
                     ErrorMessage = "Failed to add comment. Please try again.";
                 }
             }
             catch (Exception ex)
             {
+                if (Request.Headers["X-Requested-With"] == "XMLHttpRequest")
+                {
+                    return new JsonResult(new { success = false, message = "An error occurred while adding the comment: " + ex.Message });
+                }
                 ErrorMessage = "An error occurred while adding the comment: " + ex.Message;
             }
 
