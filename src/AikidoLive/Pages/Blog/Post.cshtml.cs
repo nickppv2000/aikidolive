@@ -183,6 +183,10 @@ namespace AikidoLive.Pages.BlogManagement
         {
             if (!User?.Identity?.IsAuthenticated == true || string.IsNullOrEmpty(id) || string.IsNullOrEmpty(commentId))
             {
+                if (Request.Headers["X-Requested-With"] == "XMLHttpRequest")
+                {
+                    return new JsonResult(new { success = false, message = "Unauthorized or invalid request" });
+                }
                 return NotFound();
             }
 
@@ -190,12 +194,20 @@ namespace AikidoLive.Pages.BlogManagement
             var blogPost = await _blogService.GetBlogPostByIdAsync(id);
             if (blogPost == null)
             {
+                if (Request.Headers["X-Requested-With"] == "XMLHttpRequest")
+                {
+                    return new JsonResult(new { success = false, message = "Blog post not found" });
+                }
                 return NotFound();
             }
 
             var comment = blogPost.Comments.FirstOrDefault(c => c.Id == commentId);
             if (comment == null)
             {
+                if (Request.Headers["X-Requested-With"] == "XMLHttpRequest")
+                {
+                    return new JsonResult(new { success = false, message = "Comment not found" });
+                }
                 return NotFound();
             }
 
@@ -207,16 +219,31 @@ namespace AikidoLive.Pages.BlogManagement
             
             if (!canDelete)
             {
+                if (Request.Headers["X-Requested-With"] == "XMLHttpRequest")
+                {
+                    return new JsonResult(new { success = false, message = "Not authorized to delete this comment" });
+                }
                 return Forbid();
             }
 
             try
             {
                 await _blogService.DeleteCommentAsync(id, commentId);
+                
+                // For AJAX requests, return JSON response
+                if (Request.Headers["X-Requested-With"] == "XMLHttpRequest")
+                {
+                    return new JsonResult(new { success = true, message = "Comment deleted successfully" });
+                }
+                
                 SuccessMessage = "Comment deleted successfully.";
             }
-            catch (Exception)
+            catch (Exception ex)
             {
+                if (Request.Headers["X-Requested-With"] == "XMLHttpRequest")
+                {
+                    return new JsonResult(new { success = false, message = "Failed to delete comment: " + ex.Message });
+                }
                 ErrorMessage = "Failed to delete comment. Please try again.";
             }
 
