@@ -163,7 +163,9 @@ namespace AikidoLive.Services.DBConnector
                 System.Diagnostics.Debug.WriteLine($"UpdatePlaylists: Database={databaseName}, Container={containerName}, DocumentId={playlistsDocument.Id}");
 
                 _container = _client.GetContainer(databaseName, containerName);
-                var result = await _container.ReplaceItemAsync(playlistsDocument, playlistsDocument.Id, new PartitionKey(playlistsDocument.Id));
+                
+                // Try UpsertItemAsync instead of ReplaceItemAsync for better reliability
+                var result = await _container.UpsertItemAsync(playlistsDocument, new PartitionKey(playlistsDocument.Id));
                 
                 System.Diagnostics.Debug.WriteLine($"UpdatePlaylists: Success! Status Code={result.StatusCode}");
                 return true;
