@@ -1,6 +1,7 @@
 using AikidoLive.DataModels;
 using AikidoLive.Services.Authentication;
 using AikidoLive.Services.DBConnector;
+using AikidoLive.Services.Email;
 using Microsoft.Azure.Cosmos;
 using Microsoft.Extensions.Configuration;
 using Moq;
@@ -19,6 +20,7 @@ namespace AikidoLive.Tests.AuthenticationTests
         private readonly Mock<IConfiguration> _mockConfiguration;
         private readonly Mock<FeedIterator<UserList>> _mockFeedIterator;
         private readonly Mock<FeedResponse<UserList>> _mockFeedResponse;
+        private readonly Mock<IEmailService> _mockEmailService;
         
         public UserRegistrationTests()
         {
@@ -28,6 +30,12 @@ namespace AikidoLive.Tests.AuthenticationTests
             _mockConfiguration = new Mock<IConfiguration>();
             _mockFeedIterator = new Mock<FeedIterator<UserList>>();
             _mockFeedResponse = new Mock<FeedResponse<UserList>>();
+            _mockEmailService = new Mock<IEmailService>();
+            
+            // Setup email service mock to return success by default
+            _mockEmailService.Setup(x => x.SendNewUserNotificationToAdminsAsync(
+                It.IsAny<string>(), It.IsAny<string>(), It.IsAny<string>()))
+                .ReturnsAsync(true);
             
             // Setup configuration sections
             Mock<IConfigurationSection> mockLibrarySection = new Mock<IConfigurationSection>();
@@ -128,7 +136,7 @@ namespace AikidoLive.Tests.AuthenticationTests
                 .ReturnsAsync(new Mock<ItemResponse<UserList>>().Object);
             
             var dbConnector = new DBServiceConnector(_mockConfiguration.Object, _mockCosmosClient.Object);
-            var authService = new AuthService(dbConnector);
+            var authService = new AuthService(dbConnector, _mockEmailService.Object);
             
             var registerModel = new RegisterModel
             {
@@ -188,7 +196,7 @@ namespace AikidoLive.Tests.AuthenticationTests
                 .ReturnsAsync(_mockFeedResponse.Object);
             
             var dbConnector = new DBServiceConnector(_mockConfiguration.Object, _mockCosmosClient.Object);
-            var authService = new AuthService(dbConnector);
+            var authService = new AuthService(dbConnector, _mockEmailService.Object);
             
             var registerModel = new RegisterModel
             {
@@ -211,6 +219,66 @@ namespace AikidoLive.Tests.AuthenticationTests
                 It.IsAny<PartitionKey?>(),
                 It.IsAny<ItemRequestOptions>(),
                 It.IsAny<CancellationToken>()), Times.Never);
+        }
+
+        [Fact]
+        public async Task RegisterUser_WithValidData_ShouldSendAdminNotification()
+        {
+            // Arrange
+            var userList = new UserList
+            {
+                id = "users",
+                Users = new List<AikidoLive.DataModels.User>()
+            };
+            
+            _mockFeedIterator.SetupSequence(i => i.HasMoreResults)
+                .Returns(true)
+                .Returns(false);
+                
+            _mockFeedResponse.Setup(r => r.GetEnumerator())
+                .Returns(new List<UserList> { userList }.GetEnumerator());
+                
+            _mockFeedIterator.Setup(i => i.ReadNextAsync(It.IsAny<CancellationToken>()))
+                .ReturnsAsync(_mockFeedResponse.Object);
+            
+            _mockContainer.Setup(c => c.GetItemQueryIterator<UserList>(
+                    It.IsAny<QueryDefinition>(),
+                    It.IsAny<string>(),
+                    It.IsAny<QueryRequestOptions>()))
+                .Returns(_mockFeedIterator.Object);
+            
+            _mockContainer.Setup(c => c.ReplaceItemAsync(
+                    It.IsAny<UserList>(),
+                    It.IsAny<string>(),
+                    It.IsAny<PartitionKey?>(),
+                    It.IsAny<ItemRequestOptions>(),
+                    It.IsAny<CancellationToken>()))
+                .ReturnsAsync(new Mock<ItemResponse<UserList>>().Object);
+            
+            var dbConnector = new DBServiceConnector(_mockConfiguration.Object, _mockCosmosClient.Object);
+            var authService = new AuthService(dbConnector, _mockEmailService.Object);
+            
+            var registerModel = new RegisterModel
+            {
+                FirstName = "Test",
+                LastName = "User",
+                Email = "test@example.com",
+                Password = "Password123!"
+            };
+            
+            // Act
+            var result = await authService.RegisterUserAsync(registerModel);
+            
+            // Wait a bit for the background task to complete
+            await Task.Delay(100);
+            
+            // Assert
+            Assert.NotNull(result);
+            Assert.Equal("test@example.com", result.Email);
+            
+            // Verify that email notification was called
+            _mockEmailService.Verify(e => e.SendNewUserNotificationToAdminsAsync(
+                "Test", "User", "test@example.com"), Times.Once);
         }
     }
 }

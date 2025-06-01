@@ -1,5 +1,6 @@
 using AikidoLive.DataModels;
 using AikidoLive.Services.DBConnector;
+using AikidoLive.Services.Email;
 using System;
 using System.Linq;
 using System.Threading.Tasks;
@@ -10,10 +11,12 @@ namespace AikidoLive.Services.Authentication
     public class AuthService : IAuthService
     {
         private readonly DBServiceConnector _dbServiceConnector;
+        private readonly IEmailService _emailService;
 
-        public AuthService(DBServiceConnector dbServiceConnector)
+        public AuthService(DBServiceConnector dbServiceConnector, IEmailService emailService)
         {
             _dbServiceConnector = dbServiceConnector;
+            _emailService = emailService;
         }
 
         public async Task<User> AuthenticateAsync(string email, string password)
@@ -82,6 +85,23 @@ namespace AikidoLive.Services.Authentication
             // Add user to the database
             userList.Users.Add(newUser);
             await _dbServiceConnector.UpdateUser(userList);
+            
+            // Send notification to admins (non-blocking)
+            _ = Task.Run(async () =>
+            {
+                try
+                {
+                    await _emailService.SendNewUserNotificationToAdminsAsync(
+                        newUser.FirstName, 
+                        newUser.LastName, 
+                        newUser.Email);
+                }
+                catch (Exception)
+                {
+                    // Email failure should not affect user registration
+                    // Logging is handled within the email service
+                }
+            });
             
             return newUser;
         }
