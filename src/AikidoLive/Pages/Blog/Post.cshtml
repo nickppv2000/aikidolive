@@ -1,0 +1,225 @@
+@page "/Blog/Post/{id}"
+@model AikidoLive.Pages.BlogManagement.PostModel
+@{
+    ViewData["Title"] = Model.BlogPost?.Title ?? "Blog Post";
+}
+
+@if (Model.BlogPost == null)
+{
+    <div class="hero-section">
+        <h1 class="hero-title fade-in-up">❌ Post Not Found</h1>
+        <p class="hero-subtitle fade-in-up-delay">The blog post you're looking for doesn't exist.</p>
+        <div style="margin-top: 1.5rem;">
+            <a href="/Blog" class="btn btn-primary">← Back to Blog</a>
+        </div>
+    </div>
+}
+else
+{
+    <div class="hero-section">
+        <h1 class="hero-title fade-in-up">@Model.BlogPost.Title</h1>
+        <p class="hero-subtitle fade-in-up-delay">
+            By @Model.BlogPost.AuthorName • @Model.BlogPost.CreatedAt.ToString("MMMM dd, yyyy")
+            @if (Model.BlogPost.ViewCount > 0)
+            {
+                <span> • @Model.BlogPost.ViewCount view@(Model.BlogPost.ViewCount == 1 ? "" : "s")</span>
+            }
+        </p>
+        <div style="margin-top: 1rem;">
+            <a href="/Blog" class="btn btn-secondary">← Back to Blog</a>
+            @if (Model.CanEdit)
+            {
+                <a href="/Blog/Edit/@Model.BlogPost.Id" class="btn btn-primary" style="margin-left: 0.5rem;">✏️ Edit</a>
+            }
+        </div>
+    </div>
+
+    <div class="library-grid" style="max-width: 800px; margin: 0 auto;">
+        <!-- Blog Post Content -->
+        <article class="card fade-in-up">
+            <div class="card-content">
+                @if (Model.BlogPost.Tags.Any())
+                {
+                    <div style="margin-bottom: 1.5rem;">
+                        @foreach (var tag in Model.BlogPost.Tags)
+                        {
+                            <span class="badge badge-secondary" style="margin-right: 0.5rem; background: #6c757d; color: white; padding: 0.25rem 0.5rem; border-radius: 0.25rem; font-size: 0.8rem;">@tag</span>
+                        }
+                    </div>
+                }
+
+                <div class="blog-content">
+                    @Html.Raw(Model.BlogPost.Content)
+                </div>
+
+                <!-- Appreciation and Sharing -->
+                <div style="border-top: 1px solid #eee; padding-top: 1.5rem; margin-top: 2rem; text-align: center;">
+                    @if (User?.Identity?.IsAuthenticated == true)
+                    {
+                        <form method="post" asp-page-handler="ToggleAppreciation" asp-route-id="@Model.BlogPost.Id" style="display: inline;">
+                            <button type="submit" class="btn @(Model.IsAppreciated ? "btn-danger" : "btn-outline-danger")" style="margin-right: 1rem;">
+                                @if (Model.IsAppreciated)
+                                {
+                                    <span>❤️ Appreciated (@Model.BlogPost.AppreciatedBy.Count)</span>
+                                }
+                                else
+                                {
+                                    <span>🤍 Appreciate (@Model.BlogPost.AppreciatedBy.Count)</span>
+                                }
+                            </button>
+                        </form>
+                    }
+                    else
+                    {
+                        <span style="color: #666; margin-right: 1rem;">❤️ @Model.BlogPost.AppreciatedBy.Count appreciation@(Model.BlogPost.AppreciatedBy.Count == 1 ? "" : "s")</span>
+                    }
+
+                    <!-- Share Button -->
+                    <button class="btn btn-outline-primary" onclick="sharePost()" style="margin-right: 1rem;">
+                        📤 Share Post
+                    </button>
+
+                    <!-- Copy Link Button -->
+                    <button class="btn btn-outline-secondary" onclick="copyLink()">
+                        🔗 Copy Link
+                    </button>
+                </div>
+            </div>
+        </article>
+
+        <!-- Comments Section -->
+        <div class="card fade-in-up-delay">
+            <h3 class="card-title">💬 Comments (@Model.BlogPost.Comments.Count)</h3>
+            <div class="card-content">
+                @if (!string.IsNullOrEmpty(Model.ErrorMessage))
+                {
+                    <div class="alert alert-danger" role="alert">
+                        @Model.ErrorMessage
+                    </div>
+                }
+                
+                @if (!string.IsNullOrEmpty(Model.SuccessMessage))
+                {
+                    <div class="alert alert-success" role="alert">
+                        @Model.SuccessMessage
+                    </div>
+                }
+
+                <!-- Add Comment Form (for authenticated users) -->
+                @if (User?.Identity?.IsAuthenticated == true)
+                {
+                    <form method="post" asp-page-handler="AddComment" asp-route-id="@Model.BlogPost.Id" style="margin-bottom: 2rem;">
+                        <div class="form-group">
+                            <label asp-for="NewComment.Content" class="form-label">Add a comment:</label>
+                            <textarea asp-for="NewComment.Content" class="form-control" rows="3" 
+                                      placeholder="Share your thoughts about this post..."></textarea>
+                            <span asp-validation-for="NewComment.Content" class="text-danger"></span>
+                        </div>
+                        <input asp-for="NewComment.BlogPostId" type="hidden" />
+                        <button type="submit" class="btn btn-primary" style="margin-top: 0.5rem;">💬 Post Comment</button>
+                    </form>
+                }
+                else
+                {
+                    <div style="text-align: center; margin-bottom: 2rem; padding: 1rem; background: #f8f9fa; border-radius: 0.5rem;">
+                        <p>Please <a href="/Account/Login">login</a> to leave a comment.</p>
+                    </div>
+                }
+
+                <!-- Display Comments -->
+                @if (Model.BlogPost.Comments.Any())
+                {
+                    @foreach (var comment in Model.BlogPost.Comments.OrderByDescending(c => c.CreatedAt))
+                    {
+                        <div style="border-bottom: 1px solid #eee; padding: 1rem 0; margin-bottom: 1rem;">
+                            <div style="font-weight: 600; color: #333; margin-bottom: 0.5rem;">
+                                @comment.AuthorName
+                                <span style="font-weight: normal; color: #666; font-size: 0.9rem;">
+                                    • @comment.CreatedAt.ToString("MMM dd, yyyy 'at' h:mm tt")
+                                </span>
+                            </div>
+                            <div style="color: #555; line-height: 1.5;">
+                                @comment.Content
+                            </div>
+                        </div>
+                    }
+                }
+                else
+                {
+                    <div style="text-align: center; color: #666; font-style: italic;">
+                        No comments yet. Be the first to share your thoughts!
+                    </div>
+                }
+            </div>
+        </div>
+    </div>
+}
+
+<script>
+function sharePost() {
+    if (navigator.share) {
+        navigator.share({
+            title: '@Html.Raw(Json.Serialize(Model.BlogPost?.Title ?? ""))',
+            text: 'Check out this Aikido blog post',
+            url: window.location.href
+        });
+    } else {
+        copyLink();
+    }
+}
+
+function copyLink() {
+    navigator.clipboard.writeText(window.location.href).then(function() {
+        alert('Link copied to clipboard!');
+    }).catch(function() {
+        prompt('Copy this link:', window.location.href);
+    });
+}
+</script>
+
+<style>
+.blog-content {
+    line-height: 1.8;
+    font-size: 1.1rem;
+}
+
+.blog-content h1, .blog-content h2, .blog-content h3, 
+.blog-content h4, .blog-content h5, .blog-content h6 {
+    margin-top: 2rem;
+    margin-bottom: 1rem;
+    color: #333;
+}
+
+.blog-content p {
+    margin-bottom: 1.2rem;
+}
+
+.blog-content blockquote {
+    border-left: 4px solid #007bff;
+    padding-left: 1rem;
+    margin: 1.5rem 0;
+    font-style: italic;
+    color: #666;
+}
+
+.blog-content img {
+    max-width: 100%;
+    height: auto;
+    border-radius: 0.5rem;
+    margin: 1rem 0;
+}
+
+.blog-content iframe {
+    max-width: 100%;
+    border-radius: 0.5rem;
+    margin: 1rem 0;
+}
+
+.badge {
+    display: inline-block;
+}
+</style>
+
+@section Scripts {
+    @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
+}
