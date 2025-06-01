@@ -1,0 +1,100 @@
+@page "/Blog/Create"
+@model AikidoLive.Pages.BlogManagement.CreateModel
+@{
+    ViewData["Title"] = "Create Blog Post";
+}
+
+<div class="hero-section">
+    <h1 class="hero-title fade-in-up">✍️ Create New Blog Post</h1>
+    <p class="hero-subtitle fade-in-up-delay">Share your Aikido insights with the community</p>
+</div>
+
+<div class="library-grid" style="max-width: 800px; margin: 0 auto;">
+    <div class="card fade-in-up">
+        <div class="card-content">
+            @if (!string.IsNullOrEmpty(Model.ErrorMessage))
+            {
+                <div class="alert alert-danger" role="alert">
+                    @Model.ErrorMessage
+                </div>
+            }
+            
+            @if (!string.IsNullOrEmpty(Model.SuccessMessage))
+            {
+                <div class="alert alert-success" role="alert">
+                    @Model.SuccessMessage
+                </div>
+            }
+
+            <form method="post">
+                <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+                
+                <div class="form-group" style="margin-bottom: 1.5rem;">
+                    <label asp-for="BlogPost.Title" class="form-label">Post Title</label>
+                    <input asp-for="BlogPost.Title" class="form-control" placeholder="Enter your blog post title" />
+                    <span asp-validation-for="BlogPost.Title" class="text-danger"></span>
+                </div>
+
+                <div class="form-group" style="margin-bottom: 1.5rem;">
+                    <label asp-for="BlogPost.Tags" class="form-label">Tags (optional)</label>
+                    <input asp-for="BlogPost.Tags" class="form-control" placeholder="aikido, philosophy, training (comma-separated)" />
+                    <small class="form-text text-muted">Separate tags with commas</small>
+                    <span asp-validation-for="BlogPost.Tags" class="text-danger"></span>
+                </div>
+
+                <div class="form-group" style="margin-bottom: 1.5rem;">
+                    <label asp-for="BlogPost.Content" class="form-label">Content</label>
+                    <textarea asp-for="BlogPost.Content" class="form-control" rows="15" 
+                              placeholder="Write your blog post content here. You can use HTML for formatting..."></textarea>
+                    <small class="form-text text-muted">
+                        You can use HTML tags for formatting. Supported: &lt;b&gt;, &lt;i&gt;, &lt;u&gt;, &lt;h1-h6&gt;, &lt;p&gt;, &lt;br&gt;, &lt;a&gt;, &lt;img&gt;, &lt;blockquote&gt;, &lt;ul&gt;, &lt;ol&gt;, &lt;li&gt;<br/>
+                        For YouTube videos: &lt;iframe src="https://www.youtube.com/embed/VIDEO_ID"&gt;&lt;/iframe&gt;<br/>
+                        For Vimeo videos: &lt;iframe src="https://player.vimeo.com/video/VIDEO_ID"&gt;&lt;/iframe&gt;
+                    </small>
+                    <span asp-validation-for="BlogPost.Content" class="text-danger"></span>
+                </div>
+
+                <div class="form-group" style="margin-bottom: 1.5rem;">
+                    <div class="form-check">
+                        <input asp-for="BlogPost.IsPublished" class="form-check-input" type="checkbox" />
+                        <label asp-for="BlogPost.IsPublished" class="form-check-label">
+                            Publish immediately (if unchecked, post will be saved as draft)
+                        </label>
+                    </div>
+                </div>
+
+                <div style="text-align: center; padding-top: 1rem;">
+                    <button type="submit" class="btn btn-primary">
+                        <span id="submit-text">💾 Save Post</span>
+                    </button>
+                    <a href="/Blog" class="btn btn-secondary" style="margin-left: 1rem;">Cancel</a>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const publishCheckbox = document.querySelector('input[name="BlogPost.IsPublished"]');
+    const submitButton = document.querySelector('button[type="submit"]');
+    const submitText = document.getElementById('submit-text');
+    
+    function updateSubmitButton() {
+        if (publishCheckbox.checked) {
+            submitText.textContent = '🚀 Publish Post';
+            submitButton.className = 'btn btn-primary';
+        } else {
+            submitText.textContent = '💾 Save as Draft';
+            submitButton.className = 'btn btn-secondary';
+        }
+    }
+    
+    publishCheckbox.addEventListener('change', updateSubmitButton);
+    updateSubmitButton(); // Initial state
+});
+</script>
+
+@section Scripts {
+    @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
+}

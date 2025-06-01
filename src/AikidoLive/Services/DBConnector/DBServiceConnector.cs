@@ -7,7 +7,7 @@ using AikidoLive.DataModels;
 
 namespace AikidoLive.Services.DBConnector
 {
-    public class DBServiceConnector : IDisposable
+    public class DBServiceConnector : IDBServiceConnector, IDisposable
     {
         private readonly CosmosClient _client;
         private Container? _container;
@@ -17,6 +17,7 @@ namespace AikidoLive.Services.DBConnector
         private string _libraryDbName;
         private string _usersDBName;
         private string _playlistsDBName;
+        private string _blogDBName;
 
         public DBServiceConnector(IConfiguration configuration, CosmosClient client)
         {
@@ -32,7 +33,25 @@ namespace AikidoLive.Services.DBConnector
             var playlistsDbSettings = configuration.GetSection("playlistsDB");
             _playlistsDBName = playlistsDbSettings["document"] ?? "";
 
-            _databases = GetDatabasesListAsync().GetAwaiter().GetResult();
+            var blogDbSettings = configuration.GetSection("blogDB");
+            _blogDBName = blogDbSettings["document"] ?? "";
+
+            Console.WriteLine($"DBServiceConnector initializing with:");
+            Console.WriteLine($"  - Library document: {_libraryDbName}");
+            Console.WriteLine($"  - Users document: {_usersDBName}");
+            Console.WriteLine($"  - Playlists document: {_playlistsDBName}");
+            Console.WriteLine($"  - Blog document: {_blogDBName}");
+
+            try
+            {
+                _databases = GetDatabasesListAsync().GetAwaiter().GetResult();
+                Console.WriteLine($"Database discovery completed successfully. Found {_databases.Count} databases.");
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"Database discovery failed during constructor: {ex.Message}");
+                // Don't throw here - let the methods handle the empty dictionary gracefully
+            }
         }
 
         public void Dispose()
@@ -139,20 +158,42 @@ namespace AikidoLive.Services.DBConnector
 
         public async Task<List<string>> GetDatabasesListAsync()
         {
-            var iterator = _client.GetDatabaseQueryIterator<DatabaseProperties>();
-            var databases = new List<string>();
-
-            while (iterator.HasMoreResults)
+            try
             {
-                foreach (var database in await iterator.ReadNextAsync())
-                {
-                    databases.Add(database.Id);
-                    var containers = GetContainersListAsync(database.Id).Result;
-                    _databasesDictionary.Add(database.Id, containers);
-                }
-            }
+                var iterator = _client.GetDatabaseQueryIterator<DatabaseProperties>();
+                var databases = new List<string>();
 
-            return databases;
+                while (iterator.HasMoreResults)
+                {
+                    foreach (var database in await iterator.ReadNextAsync())
+                    {
+                        databases.Add(database.Id);
+                        var containers = await GetContainersListAsync(database.Id);
+                        _databasesDictionary.Add(database.Id, containers);
+                    }
+                }
+
+                Console.WriteLine($"Database discovery found {databases.Count} databases:");
+                foreach (var db in databases)
+                {
+                    Console.WriteLine($"  - Database: {db}");
+                    if (_databasesDictionary.ContainsKey(db))
+                    {
+                        foreach (var container in _databasesDictionary[db])
+                        {
+                            Console.WriteLine($"    - Container: {container}");
+                        }
+                    }
+                }
+
+                return databases;
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"Database discovery failed: {ex.Message}");
+                Console.WriteLine($"Stack trace: {ex.StackTrace}");
+                throw new Exception($"Failed to discover databases: {ex.Message}", ex);
+            }
         }
         public async Task<List<string>> GetContainersListAsync(string databaseName)
         {
@@ -170,6 +211,97 @@ namespace AikidoLive.Services.DBConnector
 
             return containers;
         }
-    }
 
+        // Blog-related methods
+        public async Task<List<BlogDocument>> GetBlogPosts()
+        {
+            try
+            {
+                // Check if database discovery was successful
+                if (_databasesDictionary == null || !_databasesDictionary.Any())
+                {
+                    throw new InvalidOperationException("Database discovery failed. No databases found in _databasesDictionary.");
+                }
+
+                string databaseName = _databasesDictionary.Keys.First();
+                string containerName = _databasesDictionary.Values.First().First();
+
+                _container = _client.GetContainer(databaseName, containerName);
+                
+                var query = new QueryDefinition("SELECT * FROM c WHERE c.id = @id")
+                    .WithParameter("@id", _blogDBName);
+                
+                var iterator = _container.GetItemQueryIterator<BlogDocument>(query);
+                var blogDocuments = new List<BlogDocument>();
+
+                while (iterator.HasMoreResults)
+                {
+                    var response = await iterator.ReadNextAsync();
+                    blogDocuments.AddRange(response.ToList());
+                }
+
+                return blogDocuments;
+            }
+            catch (Exception ex)
+            {
+                // Log the actual error for debugging
+                Console.WriteLine($"GetBlogPosts failed: {ex.Message}");
+                Console.WriteLine($"Stack trace: {ex.StackTrace}");
+                
+                // Return empty list instead of trying to create document here
+                // Let the service layer handle document creation
+                return new List<BlogDocument>();
+            }
+        }
+
+        public async Task<bool> CreateBlogDocument(BlogDocument blogDocument)
+        {
+            try
+            {
+                // Check if database discovery was successful
+                if (_databasesDictionary == null || !_databasesDictionary.Any())
+                {
+                    throw new InvalidOperationException("Database discovery failed. No databases found in _databasesDictionary.");
+                }
+
+                string databaseName = _databasesDictionary.Keys.First();
+                string containerName = _databasesDictionary.Values.First().First();
+
+                _container = _client.GetContainer(databaseName, containerName);
+                await _container.CreateItemAsync(blogDocument);
+                return true;
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"CreateBlogDocument failed: {ex.Message}");
+                Console.WriteLine($"Stack trace: {ex.StackTrace}");
+                return false;
+            }
+        }
+
+        public async Task<bool> UpdateBlogDocument(BlogDocument blogDocument)
+        {
+            try
+            {
+                // Check if database discovery was successful
+                if (_databasesDictionary == null || !_databasesDictionary.Any())
+                {
+                    throw new InvalidOperationException("Database discovery failed. No databases found in _databasesDictionary.");
+                }
+
+                string databaseName = _databasesDictionary.Keys.First();
+                string containerName = _databasesDictionary.Values.First().First();
+
+                _container = _client.GetContainer(databaseName, containerName);
+                await _container.ReplaceItemAsync(blogDocument, blogDocument.id);
+                return true;
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"UpdateBlogDocument failed: {ex.Message}");
+                Console.WriteLine($"Stack trace: {ex.StackTrace}");
+                return false;
+            }
+        }
+    }
 }

@@ -5,20 +5,35 @@ using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using Microsoft.Extensions.Logging;
+using AikidoLive.Services.Blog;
+using AikidoLive.DataModels;
 
 namespace AikidoLive.Pages
 {
-    public class Blog : PageModel
+    public class BlogIndex : PageModel
     {
-        private readonly ILogger<Blog> _logger;
+        private readonly ILogger<BlogIndex> _logger;
+        private readonly IBlogService _blogService;
 
-        public Blog(ILogger<Blog> logger)
+        public List<BlogPost> BlogPosts { get; set; } = new List<BlogPost>();
+
+        public BlogIndex(ILogger<BlogIndex> logger, IBlogService blogService)
         {
             _logger = logger;
+            _blogService = blogService;
         }
 
-        public void OnGet()
+        public async Task OnGetAsync()
         {
+            try
+            {
+                BlogPosts = await _blogService.GetPublishedBlogPostsAsync();
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Error loading blog posts");
+                BlogPosts = new List<BlogPost>();
+            }
         }
     }
 }

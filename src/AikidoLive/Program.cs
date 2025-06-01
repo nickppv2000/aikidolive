@@ -33,6 +33,7 @@ builder.Services.AddAuthentication(CookieAuthenticationDefaults.AuthenticationSc
 builder.Services.AddAuthorization();
 
 // Add DBServiceConnector
+builder.Services.AddScoped<IDBServiceConnector, DBServiceConnector>();
 builder.Services.AddScoped<DBServiceConnector>();
 
 builder.Services.AddSingleton(x => 
@@ -46,6 +47,9 @@ builder.Services.AddSingleton(x =>
 
 // Add Authentication Services
 builder.Services.AddScoped<IAuthService, AuthService>();
+
+// Add Blog Service
+builder.Services.AddScoped<AikidoLive.Services.Blog.IBlogService, AikidoLive.Services.Blog.BlogService>();
 
 var app = builder.Build();
 
