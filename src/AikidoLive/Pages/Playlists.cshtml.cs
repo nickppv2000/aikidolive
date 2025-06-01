@@ -10,6 +10,7 @@ using AikidoLive.Services.DBConnector;
 using AikidoLive.DataModels;
 using System.Security.Claims;
 using System.ComponentModel.DataAnnotations;
+using System.Text.RegularExpressions;
 
 
 
@@ -111,7 +112,7 @@ namespace AikidoLive.Pages
                 {
                     Name = AddTrackInput.TrackName,
                     Description = AddTrackInput.Description ?? "",
-                    Url = AddTrackInput.Url,
+                    Url = ProcessVideoUrl(AddTrackInput.Url, AddTrackInput.Source),
                     Source = AddTrackInput.Source
                 };
 
@@ -138,6 +139,38 @@ namespace AikidoLive.Pages
 
             await OnGetAsync();
             return Page();
+        }
+
+        private string ProcessVideoUrl(string url, string source)
+        {
+            if (string.IsNullOrEmpty(url))
+                return url;
+
+            // For Vimeo, extract just the video ID if a full URL is provided
+            if (source.ToLower() == "vimeo")
+            {
+                // If it's already just a number, return as-is
+                if (url.All(char.IsDigit))
+                    return url;
+
+                // Extract video ID from various Vimeo URL formats
+                var vimeoPatterns = new[]
+                {
+                    @"vimeo\.com/(\d+)",
+                    @"player\.vimeo\.com/video/(\d+)"
+                };
+
+                foreach (var pattern in vimeoPatterns)
+                {
+                    var match = System.Text.RegularExpressions.Regex.Match(url, pattern);
+                    if (match.Success)
+                    {
+                        return match.Groups[1].Value;
+                    }
+                }
+            }
+
+            return url;
         }
 
         public class AddTrackInputModel
