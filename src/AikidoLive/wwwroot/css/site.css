@@ -46,7 +46,7 @@
 
 .user-greeting {
     padding: 8px;
-    color: #495057;
+    color: var(--white);
     font-weight: 500;
 }
 
