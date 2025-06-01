@@ -130,7 +130,7 @@ namespace AikidoLive.Pages.BlogManagement
                 // Silently fail for appreciation toggle
             }
 
-            return RedirectToPage("/Blog/Post/" + id);
+            return RedirectToPage("/Blog/Post", new { id = id });
         }
 
         private async Task LoadPostData(string id)

@@ -1,0 +1,117 @@
+@page "/Blog/MyPosts"
+@model AikidoLive.Pages.BlogManagement.MyPostsModel
+@{
+    ViewData["Title"] = "My Blog Posts";
+}
+
+<div class="hero-section">
+    <h1 class="hero-title fade-in-up">📝 My Blog Posts</h1>
+    <p class="hero-subtitle fade-in-up-delay">Manage your Aikido insights and writings</p>
+    <div style="margin-top: 1.5rem;">
+        <a href="/Blog/Create" class="btn btn-primary">✍️ Write New Post</a>
+        <a href="/Blog" class="btn btn-secondary" style="margin-left: 0.5rem;">← Back to Blog</a>
+    </div>
+</div>
+
+<div class="library-grid">
+    @if (!string.IsNullOrEmpty(Model.ErrorMessage))
+    {
+        <div class="card fade-in-up">
+            <div class="card-content">
+                <div class="alert alert-danger" role="alert">
+                    @Model.ErrorMessage
+                </div>
+            </div>
+        </div>
+    }
+    
+    @if (Model.MyBlogPosts.Any())
+    {
+        @foreach (var post in Model.MyBlogPosts.OrderByDescending(p => p.UpdatedAt))
+        {
+            <article class="card fade-in-up">
+                <h2 class="card-title">
+                    @post.Title
+                    @if (!post.IsPublished)
+                    {
+                        <span class="badge badge-warning" style="background: #ffc107; color: #212529; padding: 0.25rem 0.5rem; border-radius: 0.25rem; font-size: 0.8rem; margin-left: 0.5rem;">DRAFT</span>
+                    }
+                </h2>
+                <div class="card-content">
+                    <p><em>
+                        @if (post.IsPublished)
+                        {
+                            <span>Published on @post.CreatedAt.ToString("MMMM dd, yyyy")</span>
+                        }
+                        else
+                        {
+                            <span>Draft created on @post.CreatedAt.ToString("MMMM dd, yyyy")</span>
+                        }
+                        @if (post.UpdatedAt > post.CreatedAt.AddMinutes(1))
+                        {
+                            <span> • Updated @post.UpdatedAt.ToString("MMMM dd, yyyy")</span>
+                        }
+                    </em></p>
+                    
+                    @if (post.Tags.Any())
+                    {
+                        <div style="margin: 0.5rem 0;">
+                            @foreach (var tag in post.Tags)
+                            {
+                                <span class="badge badge-secondary" style="margin-right: 0.5rem; background: #6c757d; color: white; padding: 0.25rem 0.5rem; border-radius: 0.25rem; font-size: 0.8rem;">@tag</span>
+                            }
+                        </div>
+                    }
+                    
+                    @{
+                        var previewContent = post.Content.Length > 150 ? 
+                            post.Content.Substring(0, 150) + "..." : 
+                            post.Content;
+                        // Remove any HTML tags for preview
+                        previewContent = System.Text.RegularExpressions.Regex.Replace(previewContent, "<.*?>", "");
+                    }
+                    <p>@previewContent</p>
+                    
+                    <div style="margin-top: 1rem;">
+                        @if (post.IsPublished)
+                        {
+                            <a href="/Blog/Post/@post.Id" class="btn btn-secondary">👁️ View</a>
+                        }
+                        else
+                        {
+                            <span style="color: #666;">👁️ Not published</span>
+                        }
+                        <a href="/Blog/Edit/@post.Id" class="btn btn-primary" style="margin-left: 0.5rem;">✏️ Edit</a>
+                        
+                        <form method="post" asp-page-handler="Delete" asp-route-id="@post.Id" 
+                              style="display: inline; margin-left: 0.5rem;"
+                              onsubmit="return confirm('Are you sure you want to delete this blog post? This action cannot be undone.');">
+                            <button type="submit" class="btn btn-danger">🗑️ Delete</button>
+                        </form>
+                        
+                        @if (post.IsPublished)
+                        {
+                            <div style="margin-top: 0.5rem; font-size: 0.9rem; color: #666;">
+                                ❤️ @post.AppreciatedBy.Count appreciation@(post.AppreciatedBy.Count == 1 ? "" : "s")
+                                • 💬 @post.Comments.Count comment@(post.Comments.Count == 1 ? "" : "s")
+                                • 👁️ @post.ViewCount view@(post.ViewCount == 1 ? "" : "s")
+                            </div>
+                        }
+                    </div>
+                </div>
+            </article>
+        }
+    }
+    else
+    {
+        <div class="card fade-in-up" style="text-align: center;">
+            <h3 class="card-title">📝 No Posts Yet</h3>
+            <div class="card-content">
+                <p>You haven't written any blog posts yet. Start sharing your Aikido insights with the community!</p>
+                <div style="margin-top: 1.5rem;">
+                    <a href="/Blog/Create" class="btn btn-primary">Write Your First Post</a>
+                </div>
+            </div>
+        </div>
+    }
+</div>

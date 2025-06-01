@@ -61,7 +61,7 @@ namespace AikidoLive.Pages.BlogManagement
                 {
                     if (blogPost.IsPublished)
                     {
-                        return RedirectToPage("/Blog/Post/" + blogPost.Id);
+                        return RedirectToPage("/Blog/Post", new { id = blogPost.Id });
                     }
                     else
                     {
