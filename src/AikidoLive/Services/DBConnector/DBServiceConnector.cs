@@ -135,6 +135,23 @@ namespace AikidoLive.Services.DBConnector
             return playlistsDocuments;
         }
 
+        public async Task<bool> UpdatePlaylists(PlaylistsDocument playlistsDocument)
+        {
+            try
+            {
+                string databaseName = _databasesDictionary.Keys.First();
+                string containerName = _databasesDictionary.Values.First().First();
+
+                _container = _client.GetContainer(databaseName, containerName);
+                await _container.ReplaceItemAsync(playlistsDocument, playlistsDocument.Id);
+                return true;
+            }
+            catch (Exception)
+            {
+                return false;
+            }
+        }
+
 
 
         public async Task<List<string>> GetDatabasesListAsync()
