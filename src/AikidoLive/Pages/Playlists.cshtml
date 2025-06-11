@@ -49,6 +49,81 @@
             </div>
         </div>
     </div>
+
+    @if (Model.IsAdmin)
+    {
+        <!-- Admin Management Section -->
+        <div class="admin-section card" style="margin-top: 2rem;">
+            <div class="card-content">
+                <h3>🔧 Admin: Add New Track to Playlist</h3>
+                
+                @* Show success/error messages near the form *@
+                @if (!string.IsNullOrEmpty(Model.SuccessMessage))
+                {
+                    <div class="alert alert-success alert-dismissible fade show" role="alert" style="margin-bottom: 1rem;">
+                        @Model.SuccessMessage
+                        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                    </div>
+                }
+
+                @if (!string.IsNullOrEmpty(Model.ErrorMessage))
+                {
+                    <div class="alert alert-danger alert-dismissible fade show" role="alert" style="margin-bottom: 1rem;">
+                        @Model.ErrorMessage
+                        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                    </div>
+                }
+                
+                <form method="post" asp-page-handler="AddTrack" class="admin-form">
+                    <div class="form-group" style="margin-bottom: 1rem;">
+                        <label for="playlistSelect" class="form-label">Playlist:</label>
+                        <select asp-for="AddTrackInput.PlaylistName" id="playlistSelect" class="form-control" required>
+                            <option value="">-- Select Playlist --</option>
+                            @foreach (var docs in Model._playlistsDocuments)
+                            {
+                                @foreach (var content in docs.PlaylistsContents)
+                                {
+                                    <option value="@content.PlaylistName">@content.PlaylistName</option>
+                                }
+                            }
+                        </select>
+                        <span asp-validation-for="AddTrackInput.PlaylistName" class="text-danger"></span>
+                    </div>
+
+                    <div class="form-group" style="margin-bottom: 1rem;">
+                        <label asp-for="AddTrackInput.TrackName" class="form-label">Track Name:</label>
+                        <input asp-for="AddTrackInput.TrackName" type="text" class="form-control" required>
+                        <span asp-validation-for="AddTrackInput.TrackName" class="text-danger"></span>
+                    </div>
+
+                    <div class="form-group" style="margin-bottom: 1rem;">
+                        <label asp-for="AddTrackInput.Description" class="form-label">Description (Optional):</label>
+                        <textarea asp-for="AddTrackInput.Description" class="form-control" rows="3"></textarea>
+                        <span asp-validation-for="AddTrackInput.Description" class="text-danger"></span>
+                    </div>
+
+                    <div class="form-group" style="margin-bottom: 1rem;">
+                        <label asp-for="AddTrackInput.Url" class="form-label">Video URL:</label>
+                        <input asp-for="AddTrackInput.Url" type="url" class="form-control" placeholder="e.g., https://vimeo.com/123456789 or just the video ID for Vimeo" required>
+                        <span asp-validation-for="AddTrackInput.Url" class="text-danger"></span>
+                        <small class="form-text text-muted">For Vimeo videos, you can enter the full URL or just the video ID</small>
+                    </div>
+
+                    <div class="form-group" style="margin-bottom: 1rem;">
+                        <label asp-for="AddTrackInput.Source" class="form-label">Video Source:</label>
+                        <select asp-for="AddTrackInput.Source" class="form-control" required>
+                            <option value="vimeo">Vimeo</option>
+                            <option value="youtube">YouTube</option>
+                            <option value="other">Other</option>
+                        </select>
+                        <span asp-validation-for="AddTrackInput.Source" class="text-danger"></span>
+                    </div>
+
+                    <button type="submit" class="btn btn-primary">Add Track</button>
+                </form>
+            </div>
+        </div>
+    }
 }
 else
 {
@@ -133,3 +208,7 @@ else
         }
     }
 </script>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+}
